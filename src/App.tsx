@@ -7,9 +7,6 @@ import Home from './pages/Home';
 import {
   generateTestMobileNumber,
   generateTestLandlineNumber,
-  isTestMobileNumber,
-  isTestLandlineNumber,
-  isTestPhoneNumber,
   generateTestBSN,
   isValidBSN,
   generateTestDutchIBAN,
