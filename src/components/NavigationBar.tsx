@@ -92,6 +92,7 @@ const NavigationBar: React.FC = () => {
         >
           <Link to="/" style={{ padding: '1rem', color: '#1e3a8a', textDecoration: 'none', display: 'block' }} onClick={() => setOpen(false)}>Home</Link>
           <Link to="/generators" style={{ padding: '1rem', color: '#1e3a8a', textDecoration: 'none', display: 'block' }} onClick={() => setOpen(false)}>Generators</Link>
+          <Link to="/npm" style={{ padding: '1rem', color: '#1e3a8a', textDecoration: 'none', display: 'block' }} onClick={() => setOpen(false)}>NPM</Link>
         </div>
       </div>
     </nav>
