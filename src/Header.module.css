@@ -1,0 +1,50 @@
+.header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem 2.5rem 1.2rem 2.5rem;
+  background: rgba(255,255,255,0.92); /* semi-transparant voor minder "balk" gevoel */
+  box-shadow: 0 2px 16px 0 rgba(33,123,255,0.07);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  backdrop-filter: blur(8px); /* subtiele blur voor modern effect */
+  border-bottom: 1.5px solid #e3f2fd;
+  transition: background 0.3s;
+}
+.left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.logo {
+  width: 40px;
+  height: 40px;
+}
+.title {
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: #6c47d8;
+  letter-spacing: 0.04em;
+  margin-left: 0.5rem;
+}
+.avatars {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ece6fa;
+  box-shadow: 0 1px 4px rgba(108,71,216,0.10);
+  background: #f3eaff;
+  transition: transform 0.15s;
+}
+.avatar:hover {
+  transform: scale(1.08);
+  box-shadow: 0 2px 8px rgba(108,71,216,0.18);
+}
