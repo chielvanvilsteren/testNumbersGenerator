@@ -4,6 +4,7 @@ import Card from './Card';
 import styles from './App.module.css';
 import NavigationBar from './components/NavigationBar';
 import Home from './pages/Home';
+import Npm from './pages/Npm';
 import {
   generateTestMobileNumber,
   generateTestLandlineNumber,
@@ -187,6 +188,7 @@ function App() {
       <NavigationBar />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/npm" element={<Npm />} />
         <Route path="/generators" element={
           <div className={styles.appBg}>
             <div className={styles.container}>
@@ -197,7 +199,7 @@ function App() {
                 margin: '2rem 0',
               }}>
                 <img
-                  src="/favicon.ico"
+                  src="/app.ico"
                   alt="Favicon"
                   style={{
                     width: 600,
@@ -569,7 +571,8 @@ function App() {
                           {data.bsnCheck && (
                             <div
                               style={{
-                                background: '#fff',
+                                background: data.bsnCheck === 'Geldig BSN' ? '#d1fae5' : '#fee2e2', // groen of rood
+                                border: `2px solid ${data.bsnCheck === 'Geldig BSN' ? '#10b981' : '#ef4444'}`,
                                 borderRadius: '1rem',
                                 boxShadow: '0 2px 12px 0 rgba(30,58,138,0.07)',
                                 padding: '1.5rem',
@@ -579,6 +582,7 @@ function App() {
                                 flexDirection: 'column',
                                 alignItems: 'center',
                                 marginBottom: 0,
+                                transition: 'background 0.2s',
                               }}
                             >
                               <div style={{ fontWeight: 600, color: '#1e3a8a', marginBottom: '0.5rem', fontSize: '0.95rem' }}>Check geldig BSN</div>
@@ -711,7 +715,8 @@ function App() {
                           {data.ibanCheck && (
                             <div
                               style={{
-                                background: '#fff',
+                                background: data.ibanCheck === 'Geldig IBAN' ? '#d1fae5' : '#fee2e2', // groen of rood
+                                border: `2px solid ${data.ibanCheck === 'Geldig IBAN' ? '#10b981' : '#f87171'}`, // groene of rode border
                                 borderRadius: '1rem',
                                 boxShadow: '0 2px 12px 0 rgba(30,58,138,0.07)',
                                 padding: '1.5rem',
@@ -721,6 +726,7 @@ function App() {
                                 flexDirection: 'column',
                                 alignItems: 'center',
                                 marginBottom: 0,
+                                transition: 'background 0.2s',
                               }}
                             >
                               <div style={{ fontWeight: 600, color: '#1e3a8a', marginBottom: '0.5rem', fontSize: '0.95rem' }}>Check geldig IBAN</div>
@@ -853,7 +859,8 @@ function App() {
                           {data.postcodeCheck && (
                             <div
                               style={{
-                                background: '#fff',
+                                background: data.postcodeCheck === 'Geldige postcode' ? '#d1fae5' : '#fee2e2', // groen of rood
+                                border: `2px solid ${data.postcodeCheck === 'Geldige postcode' ? '#10b981' : '#f87171'}`, // groene of rode border
                                 borderRadius: '1rem',
                                 boxShadow: '0 2px 12px 0 rgba(30,58,138,0.07)',
                                 padding: '1.5rem',
@@ -863,6 +870,7 @@ function App() {
                                 flexDirection: 'column',
                                 alignItems: 'center',
                                 marginBottom: 0,
+                                transition: 'background 0.2s',
                               }}
                             >
                               <div style={{ fontWeight: 600, color: '#1e3a8a', marginBottom: '0.5rem', fontSize: '0.95rem' }}>Check geldig postcode</div>

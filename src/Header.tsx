@@ -14,7 +14,7 @@ const Header: React.FC = () => (
   <header className={styles.header}>
     <div className={styles.left}>
       <img src={logo} alt="Ready logo" className={styles.logo} />
-      <img src="/favicon.ico" alt="Favicon" className={styles.favicon} />
+      <img src="/app.ico" alt="Favicon" className={styles.favicon} />
     </div>
     <div className={styles.avatars}>
       {avatars.map((src, i) => (

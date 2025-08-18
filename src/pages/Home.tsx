@@ -3,7 +3,7 @@ import React from 'react';
 const Home: React.FC = () => (
   <div style={{ padding: '2rem', textAlign: 'center' }}>
     <img
-      src="/favicon.ico"
+      src="/app.ico"
       alt="Favicon"
       style={{
         width: 600,
