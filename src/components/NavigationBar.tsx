@@ -1,5 +1,43 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {useLocation, useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
+
+const Nav = styled.nav`
+  width: 100%;
+  background: ${({ theme }) => `linear-gradient(90deg, ${theme.colors.primary} 0%, ${theme.colors.secondary} 100%)`};
+  padding: 0.5rem 0;
+  box-shadow: 0 4px 24px 0 rgba(30,59,76,0.18);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 2.5px solid ${({ theme }) => theme.colors.surface};
+  min-height: 68px;
+  transition: box-shadow 0.2s;
+  backdrop-filter: blur(8px);
+`;
+
+const NavButton = styled.button<{ active: boolean }>`
+  background: ${({ active, theme }) => active
+    ? `linear-gradient(90deg, ${theme.colors.background} 60%, ${theme.colors.surface} 100%)`
+    : theme.colors.secondary};
+  color: ${({ active, theme }) => active ? theme.colors.primary : theme.colors.background};
+  font-family: 'JetBrains Mono', Menlo, Monaco, Consolas, monospace;
+  font-weight: 700;
+  font-size: 1.13rem;
+  border: none;
+  border-radius: 0.7rem;
+  padding: 0.7rem 2.1rem;
+  margin: 0 0.18rem;
+  box-shadow: ${({ active }) => active ? '0 2px 12px 0 rgba(30,59,76,0.10)' : 'none'};
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  outline: none;
+  letter-spacing: 0.5px;
+  border-bottom: ${({ active, theme }) => active ? `2.5px solid ${theme.colors.surface}` : '2.5px solid transparent'};
+`;
 
 const NavigationBar: React.FC = () => {
   const [open, setOpen] = useState(false);
@@ -29,56 +67,25 @@ const NavigationBar: React.FC = () => {
   }, [open]);
 
   return (
-    <nav style={{
-      width: '100%',
-      background: 'linear-gradient(90deg, #2563eb 0%, #1e40af 100%)',
-      padding: '0.5rem 0',
-      boxShadow: '0 4px 24px 0 rgba(30,58,138,0.18)',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      position: 'sticky',
-      top: 0,
-      zIndex: 1000,
-      borderBottom: '2.5px solid #60a5fa',
-      minHeight: 68,
-      transition: 'box-shadow 0.2s',
-      backdropFilter: 'blur(8px)',
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginLeft: 0 }}>
-        <img src="/app.ico" alt="logo" style={{ width: 40, height: 40, borderRadius: '0.7rem', boxShadow: '0 2px 8px 0 rgba(30,58,138,0.13)' }} />
-        <span style={{ color: '#fff', fontWeight: 800, fontSize: '1.45rem', letterSpacing: 1.5, textShadow: '0 2px 12px rgba(30,58,138,0.13)' }}>
+    <Nav>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginLeft: '2.5rem' }}>
+        <span style={{ color: '#F9F4F1', fontWeight: 800, fontSize: '1.45rem', letterSpacing: 1.5, textShadow: '0 2px 12px rgba(30,59,76,0.13)', fontFamily: 'JetBrains Mono, Menlo, Monaco, Consolas, monospace' }}>
           test-numbers-generator
         </span>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', flex: 1, justifyContent: 'center' }}>
         {tabs.map(tab => (
-          <button
+          <NavButton
             key={tab.path}
             onClick={() => navigate(tab.path)}
-            style={{
-              background: location.pathname === tab.path ? 'linear-gradient(90deg, #fff 60%, #e0e7ef 100%)' : 'rgba(255,255,255,0.13)',
-              color: location.pathname === tab.path ? '#2563eb' : '#fff',
-              fontWeight: 700,
-              fontSize: '1.13rem',
-              border: 'none',
-              borderRadius: '0.7rem',
-              padding: '0.7rem 2.1rem',
-              margin: '0 0.18rem',
-              boxShadow: location.pathname === tab.path ? '0 2px 12px 0 rgba(30,58,138,0.10)' : undefined,
-              cursor: 'pointer',
-              transition: 'background 0.18s, color 0.18s, box-shadow 0.18s',
-              outline: 'none',
-              letterSpacing: 0.5,
-              borderBottom: location.pathname === tab.path ? '2.5px solid #2563eb' : '2.5px solid transparent',
-            }}
+            active={location.pathname === tab.path}
           >
             {tab.label}
-          </button>
+          </NavButton>
         ))}
       </div>
       <div style={{ width: 120 }} />
-    </nav>
+    </Nav>
   );
 };
 

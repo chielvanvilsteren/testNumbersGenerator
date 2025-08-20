@@ -4,12 +4,72 @@ import { useNavigate } from 'react-router-dom';
 import { engine, createTimeline, utils } from 'animejs';
 // @ts-ignore
 import * as THREE from 'three';
+import styled, { useTheme } from 'styled-components';
 
 const accent = '#2563eb';
+
+const PageBg = styled.div`
+  background: ${({ theme }) => theme.colors.background};
+  min-height: 100vh;
+  font-family: 'JetBrains Mono', Menlo, Monaco, Consolas, monospace;
+`;
+
+const HeroTitle = styled.h1`
+  color: ${({ theme }) => theme.colors.primary};
+  font-size: 48px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 1px;
+  margin: 0;
+  text-shadow: 0 4px 24px rgba(30,59,76,0.12);
+`;
+
+const HeroSubtitle = styled.p`
+  color: ${({ theme }) => theme.colors.secondary};
+  font-size: 22px;
+  font-weight: 400;
+  max-width: 700px;
+  margin: 16px auto 0 auto;
+  text-shadow: 0 2px 12px rgba(30,59,76,0.10);
+  font-family: 'JetBrains Mono', monospace;
+`;
+
+const MainButton = styled.button`
+  background: ${({ theme }) => `linear-gradient(90deg, ${theme.colors.primary} 0%, ${theme.colors.secondary} 100%)`};
+  color: ${({ theme }) => theme.colors.background};
+  border: none;
+  border-radius: 32px;
+  padding: 18px 48px;
+  font-size: 22px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 24px 0 rgba(30,59,76,0.12);
+  font-family: 'JetBrains Mono', monospace;
+  transition: background 0.2s, color 0.2s;
+  &:hover {
+    background: ${({ theme }) => theme.colors.secondary};
+    color: ${({ theme }) => theme.colors.surface};
+  }
+`;
+
+const BlinkingCursor = styled.span`
+  display: inline-block;
+  width: 1ch;
+  margin-left: 0.2ch;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.primary};
+  font-weight: 400;
+  animation: blink 1s steps(1) infinite;
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+`;
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const heroRef = useRef<HTMLDivElement>(null);
+  const theme = useTheme();
 
   useEffect(() => {
     if (!heroRef.current) return;
@@ -21,7 +81,8 @@ const Home: React.FC = () => {
     $container.style.overflow = 'hidden';
     $container.style.width = '100%';
     $container.style.height = '100%';
-    const color = '#2563eb';
+    // Use the theme's surface color (bruinige kleur) for the cubes
+    const color = new THREE.Color(theme.colors.surface);
     const { width, height } = $container.getBoundingClientRect();
     // Three.js setup
     const renderer = new THREE.WebGLRenderer({ alpha: true });
@@ -32,8 +93,9 @@ const Home: React.FC = () => {
     const camera = new THREE.PerspectiveCamera(65, width / height, 0.1, 20);
     camera.position.z = 5;
     const geometry = new THREE.BoxGeometry(1, 1, 1);
-    const material = new THREE.MeshBasicMaterial({ color, wireframe: true });
+    // Make sure each cube gets its own material instance with the correct color
     function createAnimatedCube() {
+      const material = new THREE.MeshBasicMaterial({ color, wireframe: true });
       const cube = new THREE.Mesh(geometry, material);
       const x = utils.random(-10, 10, 2);
       const y = utils.random(-5, 5, 2);
@@ -63,10 +125,10 @@ const Home: React.FC = () => {
       renderer.dispose();
       $container.innerHTML = '';
     };
-  }, []);
+  }, [theme.colors.surface]);
 
   return (
-    <div style={{ background: '#F8F8F8', minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
+    <PageBg>
       {/* Hero Section with animated cubes and text in front */}
       <section style={{ position: 'relative', width: '100vw', left: '50%', right: '50%', marginLeft: '-50vw', marginRight: '-50vw', height: '60vh', minHeight: 420, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', padding: 0 }}>
         <div ref={heroRef} style={{ position: 'absolute', width: '100vw', height: '100%', left: 0, top: 0, zIndex: 1 }} />
@@ -80,74 +142,27 @@ const Home: React.FC = () => {
           pointerEvents: 'none',
           width: '100vw',
         }}>
-          <h1 style={{
-            color: '#1e293b', // Donkerblauwe kleur
-            fontSize: 48,
-            fontWeight: 700,
-            fontFamily: 'JetBrains Mono, monospace',
-            letterSpacing: 1,
-            margin: 0,
-            textShadow: '0 4px 24px rgba(0,0,0,0.12)',
-            pointerEvents: 'auto',
-          }}>
+          <HeroTitle>
             Test Numbers Generator
-          </h1>
-          <p style={{
-            color: '#1e293b',
-            fontSize: 22,
-            fontWeight: 400,
-            maxWidth: 700,
-            margin: '16px auto 0 auto',
-            textShadow: '0 2px 12px rgba(0,0,0,0.10)',
-            fontFamily: 'JetBrains Mono, monospace',
-            pointerEvents: 'auto',
-          }}>
-            Genereer eenvoudig unieke testnummers voor jouw testautomatisering.
-          </p>
+            <BlinkingCursor>|</BlinkingCursor>
+          </HeroTitle>
+          <HeroSubtitle>Genereer eenvoudig unieke testnummers voor jouw testautomatisering.</HeroSubtitle>
         </div>
       </section>
       {/* Knoppen onder de hero, gecentreerd naast elkaar */}
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 32, marginTop: 48 }}>
-        <button
-          style={{
-            background: `linear-gradient(90deg, ${accent} 0%, #4f8cff 100%)`,
-            color: '#fff',
-            border: 'none',
-            borderRadius: 32,
-            padding: '18px 48px',
-            fontSize: 22,
-            fontWeight: 600,
-            cursor: 'pointer',
-            boxShadow: '0 4px 24px 0 rgba(37,99,235,0.12)',
-            transition: 'transform 0.18s, box-shadow 0.18s',
-          }}
+        <MainButton
           onClick={() => navigate('/generators')}
-          onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.05)'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 8px 32px 0 rgba(37,99,235,0.18)'; }}
-          onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 24px 0 rgba(37,99,235,0.12)'; }}
         >
-          Genereer testnummers via de website
-        </button>
-        <button
-          style={{
-            background: '#fff',
-            color: accent,
-            border: `2px solid ${accent}`,
-            borderRadius: 32,
-            padding: '16px 44px',
-            fontSize: 20,
-            fontWeight: 600,
-            cursor: 'pointer',
-            boxShadow: '0 2px 12px 0 rgba(37,99,235,0.08)',
-            transition: 'background 0.18s, color 0.18s',
-          }}
+          Start Genereren
+        </MainButton>
+        <MainButton
           onClick={() => navigate('/npm')}
-          onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.background = accent; (e.currentTarget as HTMLButtonElement).style.color = '#fff'; }}
-          onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.background = '#fff'; (e.currentTarget as HTMLButtonElement).style.color = accent; }}
         >
-          Implementeer in testautomatisering
-        </button>
+          Bekijk NPM info
+        </MainButton>
       </div>
-    </div>
+    </PageBg>
   );
 };
 
