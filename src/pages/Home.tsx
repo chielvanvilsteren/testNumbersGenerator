@@ -6,8 +6,6 @@ import { engine, createTimeline, utils } from 'animejs';
 import * as THREE from 'three';
 import styled, { useTheme } from 'styled-components';
 
-const accent = '#2563eb';
-
 const PageBg = styled.div`
   background: ${({ theme }) => theme.colors.background};
   min-height: 100vh;

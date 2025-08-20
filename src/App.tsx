@@ -163,7 +163,6 @@ function App() {
   const [activePostcodeMode, setActivePostcodeMode] = useState<'genereer' | 'controleer'>('genereer');
   const [adresPlaatsnaam, setAdresPlaatsnaam] = useState('');
   const [adresResult, setAdresResult] = useState<any>(null);
-  const [randomPlaatsnaam, setRandomPlaatsnaam] = useState('');
   const [plaatsnaamLoading, setPlaatsnaamLoading] = useState(false);
 
   useEffect(() => {
