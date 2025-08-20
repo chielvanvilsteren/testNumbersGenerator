@@ -31,6 +31,20 @@ const NpmExamplesTab: React.FC = () => (
   <div style={{ padding: '2rem 0', maxWidth: 700, margin: '0 auto' }}>
     <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '1.5rem', color: '#2563eb', letterSpacing: 1, textShadow: '0 2px 8px rgba(30,58,138,0.10)' }}>Voorbeelden</h2>
     <div style={{ marginBottom: '2rem' }}>
+      <h3 style={{ color: '#2563eb', fontSize: '1.13rem', marginBottom: 8, fontWeight: 700, letterSpacing: 0.5 }}>getRandomPlaatsnaam</h3>
+      <pre style={codeBlockStyle}>{`import { getRandomPlaatsnaam } from 'test-numbers-generator';
+const plaatsnaam = await getRandomPlaatsnaam();
+console.log(plaatsnaam);`}</pre>
+      <pre style={outputStyle}>{`// → 'Deventer'`}</pre>
+    </div>
+    <div style={{ marginBottom: '2rem' }}>
+      <h3 style={{ color: '#2563eb', fontSize: '1.13rem', marginBottom: 8, fontWeight: 700, letterSpacing: 0.5 }}>getRandomAdresInPlaatsnaam</h3>
+      <pre style={codeBlockStyle}>{`import { getRandomAdresInPlaatsnaam } from 'test-numbers-generator';
+const adres = await getRandomAdresInPlaatsnaam('Deventer');
+console.log(adres);`}</pre>
+      <pre style={outputStyle}>{`// → 'Brink 1, 7411 BX Deventer'`}</pre>
+    </div>
+    <div style={{ marginBottom: '2rem' }}>
       <h3 style={{ color: '#2563eb', fontSize: '1.13rem', marginBottom: 8, fontWeight: 700, letterSpacing: 0.5 }}>generateTestMobileNumber</h3>
       <pre style={codeBlockStyle}>{`import { generateTestMobileNumber } from 'test-numbers-generator';
 const dutchMobile = generateTestMobileNumber.Netherlands();

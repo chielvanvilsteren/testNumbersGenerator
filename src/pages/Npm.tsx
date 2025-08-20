@@ -1,97 +1,74 @@
 import React, { useState } from 'react';
+import styled, { useTheme } from 'styled-components';
 import NpmVersionsTab from './NpmVersionsTab';
 import NpmExamplesTab from './NpmExamplesTab';
 
+const Container = styled.div`
+  background: ${({ theme }) => theme.colors.background};
+  min-height: 100vh;
+  font-family: 'JetBrains Mono', Menlo, Monaco, Consolas, monospace;
+  color: ${({ theme }) => theme.colors.primary};
+  padding: 2rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const Card = styled.div`
+  background: ${({ theme }) => theme.colors.surface};
+  border: 1px solid ${({ theme }) => theme.colors.secondary};
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 16px 0 rgba(30,59,76,0.10);
+  max-width: 700px;
+  width: 100%;
+  padding: 2.5rem;
+  margin: 2rem 0;
+`;
+
+const TabButton = styled.button<{ active: boolean }>`
+  background: ${({ active, theme }) => active ? theme.colors.primary : theme.colors.surface};
+  color: ${({ active, theme }) => active ? theme.colors.background : theme.colors.secondary};
+  border: none;
+  border-radius: 0.5rem 0 0 0.5rem;
+  padding: 0.75rem 2rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  outline: none;
+  &:not(:first-child) {
+    border-radius: 0;
+  }
+  &:last-child {
+    border-radius: 0 0.5rem 0.5rem 0;
+  }
+`;
+
 const Npm: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'info' | 'versions' | 'examples'>('info');
+  const theme = useTheme();
 
   return (
-    <div style={{
-      background: '#fff',
-      minHeight: '100vh',
-      fontFamily: 'Inter, Roboto, system-ui, sans-serif',
-      color: '#1a202c',
-      padding: '2rem 0',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-    }}>
-      <div style={{
-        background: '#fafbfc',
-        border: '1px solid #e5e7eb',
-        borderRadius: '1.5rem',
-        boxShadow: '0 4px 16px 0 rgba(30,58,138,0.10)',
-        maxWidth: 700,
-        width: '100%',
-        padding: '2.5rem',
-        margin: '2rem 0',
-      }}>
+    <Container>
+      <Card>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '2rem' }}>
           <div>
-            <h1 style={{ fontSize: '2.2rem', fontWeight: 700, margin: 0, color: '#cb3837' }}>test-numbers-generator</h1>
-            <div style={{ fontSize: '1.1rem', color: '#374151', marginTop: 4 }}>A package for generating and validating Dutch test data (BSN, IBAN, phone, postcode, etc).</div>
+            <h1 style={{ fontSize: '2.2rem', fontWeight: 700, margin: 0, color: theme.colors.primary }}>test-numbers-generator</h1>
+            <div style={{ fontSize: '1.1rem', color: theme.colors.secondary, marginTop: 4 }}>A package for generating and validating Dutch test data (BSN, IBAN, phone, postcode, etc).</div>
           </div>
         </div>
         <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '2rem' }}>
-          <button
-            onClick={() => setActiveTab('info')}
-            style={{
-              background: activeTab === 'info' ? '#cb3837' : '#e5e7eb',
-              color: activeTab === 'info' ? '#fff' : '#1e3a8a',
-              border: 'none',
-              borderRadius: '0.5rem 0 0 0.5rem',
-              padding: '0.75rem 2rem',
-              fontWeight: 600,
-              fontSize: '1.1rem',
-              cursor: 'pointer',
-              transition: 'background 0.2s',
-              outline: 'none',
-            }}
-          >
-            Info & Usage
-          </button>
-          <button
-            onClick={() => setActiveTab('examples')}
-            style={{
-              background: activeTab === 'examples' ? '#cb3837' : '#e5e7eb',
-              color: activeTab === 'examples' ? '#fff' : '#1e3a8a',
-              border: 'none',
-              borderRadius: 0,
-              padding: '0.75rem 2rem',
-              fontWeight: 600,
-              fontSize: '1.1rem',
-              cursor: 'pointer',
-              transition: 'background 0.2s',
-              outline: 'none',
-            }}
-          >
-            Voorbeelden
-          </button>
-          <button
-            onClick={() => setActiveTab('versions')}
-            style={{
-              background: activeTab === 'versions' ? '#cb3837' : '#e5e7eb',
-              color: activeTab === 'versions' ? '#fff' : '#1e3a8a',
-              border: 'none',
-              borderRadius: '0 0.5rem 0.5rem 0',
-              padding: '0.75rem 2rem',
-              fontWeight: 600,
-              fontSize: '1.1rem',
-              cursor: 'pointer',
-              transition: 'background 0.2s',
-              outline: 'none',
-            }}
-          >
-            Versies
-          </button>
+          <TabButton active={activeTab === 'info'} onClick={() => setActiveTab('info')}>Info & Usage</TabButton>
+          <TabButton active={activeTab === 'examples'} onClick={() => setActiveTab('examples')}>Voorbeelden</TabButton>
+          <TabButton active={activeTab === 'versions'} onClick={() => setActiveTab('versions')}>Versies</TabButton>
         </div>
         {activeTab === 'info' && (
           <>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#cb3837', margin: '0 0 1.5rem 0' }}>Installatie</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: theme.colors.primary, margin: '0 0 1.5rem 0' }}>Installatie</h2>
             <pre style={{ background: '#23272f', color: '#fff', borderRadius: '0.5rem', padding: '1rem 1.5rem', fontSize: '1.1rem', marginBottom: '2.5rem', fontFamily: 'Menlo, Monaco, Consolas, monospace', overflowX: 'auto' }}>
 $ npm install test-numbers-generator
             </pre>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#cb3837', margin: '0 0 1.5rem 0' }}>Gebruik</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: theme.colors.primary, margin: '0 0 1.5rem 0' }}>Gebruik</h2>
             <div style={{ background: '#f6f8fa', border: '1px solid #e5e7eb', borderRadius: '0.5rem', padding: '1.5rem', marginBottom: '2.5rem' }}>
               <pre style={{ background: 'none', color: '#23272f', fontSize: '1rem', margin: 0, fontFamily: 'Menlo, Monaco, Consolas, monospace', overflowX: 'auto' }}>{`
 import {
@@ -115,7 +92,7 @@ const dutchMobile = generateTestMobileNumber.Netherlands(); // e.g. '06 99123456
 const isValid = isTestMobileNumber.Netherlands(dutchMobile); // true
 `}</pre>
             </div>
-            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#cb3837', margin: '2rem 0 1rem 0' }}>Deterministic password voorbeeld</h3>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: theme.colors.secondary, margin: '2rem 0 1rem 0' }}>Deterministic password voorbeeld</h3>
             <div style={{ background: '#f6f8fa', border: '1px solid #e5e7eb', borderRadius: '0.5rem', padding: '1.5rem', marginBottom: '2.5rem' }}>
               <pre style={{ background: 'none', color: '#23272f', fontSize: '1rem', margin: 0, fontFamily: 'Menlo, Monaco, Consolas, monospace', overflowX: 'auto' }}>{`
 import { generateDeterministicPassword } from 'test-numbers-generator';
@@ -137,22 +114,22 @@ console.log(password); // Always the same for the same user secret + app secret
           rel="noopener noreferrer"
           style={{
             display: 'inline-block',
-            background: '#cb3837',
-            color: '#fff',
+            background: theme.colors.primary,
+            color: theme.colors.textOnPrimary,
             fontWeight: 600,
             borderRadius: '0.5rem',
             padding: '0.75rem 2rem',
             fontSize: '1.1rem',
             textDecoration: 'none',
             marginTop: '1.5rem',
-            boxShadow: '0 2px 8px 0 rgba(203,56,55,0.10)',
+            boxShadow: `0 2px 8px 0 ${theme.colors.primary}22`,
             transition: 'background 0.2s',
           }}
         >
           Bekijk op NPM
         </a>
-      </div>
-    </div>
+      </Card>
+    </Container>
   );
 };
 
