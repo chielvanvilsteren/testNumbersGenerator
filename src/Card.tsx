@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styled, { useTheme, keyframes } from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 type CardProps = {
   label: string;
