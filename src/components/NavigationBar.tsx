@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -96,9 +96,7 @@ const GitHubButton = styled.button`
 `;
 
 const NavigationBar: React.FC = () => {
-  const [open, setOpen] = useState(false);
   const [starCount, setStarCount] = useState<number>(0);
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
   const tabs = [
@@ -124,22 +122,6 @@ const NavigationBar: React.FC = () => {
 
     fetchStarCount();
   }, []);
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    }
-    if (open) {
-      document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [open]);
 
   return (
     <Nav>
