@@ -12,13 +12,85 @@ import {
   isValidBSN,
   generateTestDutchIBAN,
   isValidDutchIBAN,
-  generateTestDutchPostcode,
-  isValidDutchPostcode,
 } from 'test-numbers-generator';
 import { getRandomAdresInPlaatsnaam, getRandomPlaatsnaam } from 'test-numbers-generator/dist/postcodeService';
 import { ThemeProvider } from 'styled-components';
 import { theme } from './theme';
 import styled from 'styled-components';
+
+// Learn More Button CSS
+const LearnMoreButtonStyles = `
+  /* From Uiverse.io by Madflows - aangepast aan app theme */ 
+  button {
+   position: relative;
+   display: inline-block;
+   cursor: pointer;
+   outline: none;
+   border: 0;
+   vertical-align: middle;
+   text-decoration: none;
+   font-family: inherit;
+   font-size: 15px;
+  }
+
+  button.learn-more {
+   font-weight: 600;
+   color: #1E3B4C;
+   text-transform: uppercase;
+   padding: 1.25em 2em;
+   background: #F9F4F1;
+   border: 2px solid #48687C;
+   border-radius: 0.75em;
+   -webkit-transform-style: preserve-3d;
+   transform-style: preserve-3d;
+   -webkit-transition: background 150ms cubic-bezier(0, 0, 0.58, 1), -webkit-transform 150ms cubic-bezier(0, 0, 0.58, 1);
+   transition: transform 150ms cubic-bezier(0, 0, 0.58, 1), background 150ms cubic-bezier(0, 0, 0.58, 1), -webkit-transform 150ms cubic-bezier(0, 0, 0.58, 1);
+  }
+
+  button.learn-more::before {
+   position: absolute;
+   content: '';
+   width: 100%;
+   height: 100%;
+   top: 0;
+   left: 0;
+   right: 0;
+   bottom: 0;
+   background: #D3C3B9;
+   border-radius: inherit;
+   -webkit-box-shadow: 0 0 0 2px #48687C, 0 0.625em 0 0 #2A4A5C;
+   box-shadow: 0 0 0 2px #48687C, 0 0.625em 0 0 #2A4A5C;
+   -webkit-transform: translate3d(0, 0.75em, -1em);
+   transform: translate3d(0, 0.75em, -1em);
+   transition: transform 150ms cubic-bezier(0, 0, 0.58, 1), box-shadow 150ms cubic-bezier(0, 0, 0.58, 1), -webkit-transform 150ms cubic-bezier(0, 0, 0.58, 1), -webkit-box-shadow 150ms cubic-bezier(0, 0, 0.58, 1);
+  }
+
+  button.learn-more:hover {
+   background: #F2EBE7;
+   -webkit-transform: translate(0, 0.25em);
+   transform: translate(0, 0.25em);
+  }
+
+  button.learn-more:hover::before {
+   -webkit-box-shadow: 0 0 0 2px #48687C, 0 0.5em 0 0 #2A4A5C;
+   box-shadow: 0 0 0 2px #48687C, 0 0.5em 0 0 #2A4A5C;
+   -webkit-transform: translate3d(0, 0.5em, -1em);
+   transform: translate3d(0, 0.5em, -1em);
+  }
+
+  button.learn-more:active {
+   background: #F2EBE7;
+   -webkit-transform: translate(0em, 0.75em);
+   transform: translate(0em, 0.75em);
+  }
+
+  button.learn-more:active::before {
+   -webkit-box-shadow: 0 0 0 2px #48687C, 0 0 #2A4A5C;
+   box-shadow: 0 0 0 2px #48687C, 0 0 #2A4A5C;
+   -webkit-transform: translate3d(0, 0, -1em);
+   transform: translate3d(0, 0, -1em);
+  }
+`;
 
 export type SupportedCountry =
     | 'Netherlands'
@@ -83,25 +155,37 @@ const GeneratorTabButton = styled.button<{ active: boolean }>`
   font-family: 'JetBrains Mono', monospace;
   font-weight: 700;
   font-size: 1.13rem;
-  border: none;
-  border-radius: 0.7rem;
+  border: 1.5px solid ${({ active, theme }) => active ? theme.colors.primary : theme.colors.secondary};
+  border-bottom: none;
+  border-radius: 0.7rem 0.7rem 0 0;
   padding: 0.7rem 2.1rem;
   margin: 0 0.18rem;
+  position: relative;
   box-shadow: ${({ active }) => active ? '0 2px 12px 0 rgba(30,59,76,0.10)' : 'none'};
   cursor: pointer;
-  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s, border-color 0.18s;
   outline: none;
   letter-spacing: 0.5px;
-  border-bottom: ${({ active, theme }) => active ? `2.5px solid ${theme.colors.secondary}` : '2.5px solid transparent'};
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: ${({ active, theme }) => active ? theme.colors.primary : 'transparent'};
+    border-radius: 0 0 2px 2px;
+    transition: background 0.18s;
+  }
 `;
 
 const TABS = [
-  { key: 'mobile', label: 'Mobiel nummer' },
-  { key: 'landline', label: 'Vast telefoonnummer' },
-  { key: 'bsn', label: 'BSN' },
-  { key: 'iban', label: 'IBAN' },
-  { key: 'postcode', label: 'Postcode' },
-  { key: 'adres', label: 'Adres (op plaatsnaam)' },
+  { key: 'mobile', label: 'Mobiel Nummer Generator' },
+  { key: 'landline', label: 'Vast Nummer Generator' },
+  { key: 'bsn', label: 'BSN Generator' },
+  { key: 'iban', label: 'IBAN Generator' },
+  { key: 'adres', label: 'Adres Generator' },
 ];
 
 const mobileCountries: { label: string; value: SupportedCountry }[] = [
@@ -154,16 +238,30 @@ function App() {
   const [landlineCountry, setLandlineCountry] = useState<SupportedCountry>('Netherlands');
   const [data, setData] = useState<{ [key: string]: string }>({});
   const [copied, setCopied] = useState<CopiedState>({});
-  const [input, setInput] = useState('');
   const [bsnInput, setBsnInput] = useState('');
   const [ibanInput, setIbanInput] = useState('');
   const [tabAnim, setTabAnim] = useState(false);
   const [activeIbanMode, setActiveIbanMode] = useState<'genereer' | 'controleer'>('genereer');
   const [activeBsnMode, setActiveBsnMode] = useState<'genereer' | 'controleer'>('genereer');
-  const [activePostcodeMode, setActivePostcodeMode] = useState<'genereer' | 'controleer'>('genereer');
   const [adresPlaatsnaam, setAdresPlaatsnaam] = useState('');
   const [adresResult, setAdresResult] = useState<any>(null);
   const [plaatsnaamLoading, setPlaatsnaamLoading] = useState(false);
+  const [internationalFormat, setInternationalFormat] = useState(true); // true = international (0031 6 23800360), false = local (0623800360)
+
+  useEffect(() => {
+    // Add the Learn More button CSS styles to the document
+    const styleSheet = document.createElement('style');
+    styleSheet.type = 'text/css';
+    styleSheet.innerText = LearnMoreButtonStyles;
+    document.head.appendChild(styleSheet);
+
+    // Cleanup styles when component unmounts
+    return () => {
+      if (document.head.contains(styleSheet)) {
+        document.head.removeChild(styleSheet);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     // Bij laden van de pagina: standaard Nederlandse nummers en andere data genereren
@@ -173,7 +271,6 @@ function App() {
       landline: generateTestLandlineNumber['Netherlands'](),
       bsn: generateTestBSN(),
       iban: generateTestDutchIBAN(),
-      postcode: generateTestDutchPostcode(),
     }));
   }, []);
 
@@ -202,9 +299,6 @@ function App() {
       case 'iban':
         value = generateTestDutchIBAN();
         break;
-      case 'postcode':
-        value = generateTestDutchPostcode();
-        break;
       default:
         value = '';
     }
@@ -217,15 +311,17 @@ function App() {
     setData({ ...data, ibanCheck: result });
     setCopied({ ...copied, ibanCheck: false });
   };
-  const handleCheckPostcode = () => {
-    const result = isValidDutchPostcode(input) ? 'Geldige postcode' : 'Ongeldige postcode';
-    setData({ ...data, postcodeCheck: result });
-    setCopied({ ...copied, postcodeCheck: false });
-  };
 
   const handleCopy = () => {
-    if (data[activeTab]) {
-      navigator.clipboard.writeText(data[activeTab]);
+    let valueToCopy = data[activeTab];
+
+    // For phone numbers, use the formatted version for copying
+    if ((activeTab === 'mobile' || activeTab === 'landline') && valueToCopy) {
+      valueToCopy = formatPhoneNumber(valueToCopy);
+    }
+
+    if (valueToCopy) {
+      navigator.clipboard.writeText(valueToCopy);
       setCopied({ ...copied, [activeTab]: true });
       setTimeout(() => setCopied((prev) => ({ ...prev, [activeTab]: false })), 1200);
     }
@@ -260,9 +356,51 @@ function App() {
       } else if (key === 'iban') {
         const newIBAN = generateTestDutchIBAN();
         setData((prev) => ({ ...prev, iban: newIBAN }));
-      } else if (key === 'postcode') {
       }
     }, 180); // animatie duur
+  };
+
+  // Helper function to format phone numbers
+  const formatPhoneNumber = (fullNumber: string): string => {
+    if (!internationalFormat) {
+      // Convert international format to local format
+      // Remove all spaces first
+      const cleaned = fullNumber.replace(/\s/g, '');
+
+      // Check for common international prefixes and convert to local format
+      const countryPrefixes: { [key: string]: string } = {
+        '0031': '0', // Netherlands: 0031 -> 0
+        '0049': '0', // Germany: 0049 -> 0
+        '0032': '0', // Belgium: 0032 -> 0
+        '0033': '0', // France: 0033 -> 0
+        '0044': '0', // UK: 0044 -> 0
+        '0034': '', // Spain: 0034 -> (no prefix)
+        '0039': '', // Italy: 0039 -> (no prefix)
+        '0043': '0', // Austria: 0043 -> 0
+        '0041': '0', // Switzerland: 0041 -> 0
+        '0046': '0', // Sweden: 0046 -> 0
+        '0047': '', // Norway: 0047 -> (no prefix)
+        '0045': '', // Denmark: 0045 -> (no prefix)
+        '00358': '0', // Finland: 00358 -> 0
+        '00351': '', // Portugal: 00351 -> (no prefix)
+        '00353': '0', // Ireland: 00353 -> 0
+        '0090': '0', // Turkey: 0090 -> 0
+        '00212': '0', // Morocco: 00212 -> 0
+      };
+
+      // Try to match and convert
+      for (const [intPrefix, localPrefix] of Object.entries(countryPrefixes)) {
+        if (cleaned.startsWith(intPrefix)) {
+          return localPrefix + cleaned.substring(intPrefix.length);
+        }
+      }
+
+      // If no match found, return as is
+      return fullNumber;
+    }
+
+    // Return international format as is
+    return fullNumber;
   };
 
   return (
@@ -293,124 +431,133 @@ function App() {
                     </GeneratorTabButton>
                   ))}
                 </GeneratorTabs>
+                {/* Toggle switch for phone number formatting */}
+                {(activeTab === 'mobile' || activeTab === 'landline') && (
+                  <div style={{ display: 'flex', justifyContent: 'center', margin: '1.5rem 0', flexDirection: 'column', alignItems: 'center' }}>
+                    <div style={{ marginBottom: '0.5rem', fontSize: '0.9rem', color: theme.colors.secondary, fontWeight: 500 }}>
+                      Nummer formaat
+                    </div>
+                    <div style={{ display: 'flex', border: `2px solid ${theme.colors.secondary}`, borderRadius: '0.75rem', overflow: 'hidden' }}>
+                      <button
+                        onClick={() => setInternationalFormat(true)}
+                        style={{
+                          background: internationalFormat ? theme.colors.primary : theme.colors.surface,
+                          color: internationalFormat ? theme.colors.background : theme.colors.primary,
+                          border: 'none',
+                          borderRadius: '0',
+                          padding: '0.75rem 1.2rem',
+                          fontWeight: 600,
+                          fontSize: '0.85rem',
+                          cursor: 'pointer',
+                          transition: 'background 0.2s',
+                          outline: 'none',
+                        }}
+                      >
+                        Internationaal
+                      </button>
+                      <button
+                        onClick={() => setInternationalFormat(false)}
+                        style={{
+                          background: !internationalFormat ? theme.colors.primary : theme.colors.surface,
+                          color: !internationalFormat ? theme.colors.background : theme.colors.primary,
+                          border: 'none',
+                          borderRadius: '0',
+                          padding: '0.75rem 1.2rem',
+                          fontWeight: 600,
+                          fontSize: '0.85rem',
+                          cursor: 'pointer',
+                          transition: 'background 0.2s',
+                          outline: 'none',
+                          borderLeft: `1px solid ${theme.colors.secondary}`,
+                        }}
+                      >
+                        Lokaal
+                      </button>
+                    </div>
+                  </div>
+                )}
                 {/* Toggle switch for IBAN tab */}
                 {activeTab === 'iban' && (
                   <div style={{ display: 'flex', justifyContent: 'center', margin: '1.5rem 0' }}>
-                    <button
-                      onClick={() => setActiveIbanMode('genereer')}
-                      style={{
-                        background: activeIbanMode === 'genereer' ? theme.colors.primary : theme.colors.surface,
-                        color: activeIbanMode === 'genereer' ? theme.colors.background : theme.colors.primary,
-                        border: 'none',
-                        borderRadius: '0.75rem 0 0 0.75rem',
-                        padding: '0.75rem 2rem',
-                        fontWeight: 600,
-                        fontSize: '1rem',
-                        cursor: 'pointer',
-                        transition: 'background 0.2s',
-                        outline: 'none',
-                      }}
-                    >
-                      Genereer
-                    </button>
-                    <button
-                      onClick={() => setActiveIbanMode('controleer')}
-                      style={{
-                        background: activeIbanMode === 'controleer' ? theme.colors.primary : theme.colors.surface,
-                        color: activeIbanMode === 'controleer' ? theme.colors.background : theme.colors.primary,
-                        border: 'none',
-                        borderRadius: '0 0.75rem 0.75rem 0',
-                        padding: '0.75rem 2rem',
-                        fontWeight: 600,
-                        fontSize: '1rem',
-                        cursor: 'pointer',
-                        transition: 'background 0.2s',
-                        outline: 'none',
-                        marginLeft: '-1px',
-                      }}
-                    >
-                      Controleer
-                    </button>
+                    <div style={{ display: 'flex', border: `2px solid ${theme.colors.secondary}`, borderRadius: '0.75rem', overflow: 'hidden' }}>
+                      <button
+                        onClick={() => setActiveIbanMode('genereer')}
+                        style={{
+                          background: activeIbanMode === 'genereer' ? theme.colors.primary : theme.colors.surface,
+                          color: activeIbanMode === 'genereer' ? theme.colors.background : theme.colors.primary,
+                          border: 'none',
+                          borderRadius: '0',
+                          padding: '0.75rem 2rem',
+                          fontWeight: 600,
+                          fontSize: '1rem',
+                          cursor: 'pointer',
+                          transition: 'background 0.2s',
+                          outline: 'none',
+                        }}
+                      >
+                        Genereer
+                      </button>
+                      <button
+                        onClick={() => setActiveIbanMode('controleer')}
+                        style={{
+                          background: activeIbanMode === 'controleer' ? theme.colors.primary : theme.colors.surface,
+                          color: activeIbanMode === 'controleer' ? theme.colors.background : theme.colors.primary,
+                          border: 'none',
+                          borderRadius: '0',
+                          padding: '0.75rem 2rem',
+                          fontWeight: 600,
+                          fontSize: '1rem',
+                          cursor: 'pointer',
+                          transition: 'background 0.2s',
+                          outline: 'none',
+                          borderLeft: `1px solid ${theme.colors.secondary}`,
+                        }}
+                      >
+                        Controleer
+                      </button>
+                    </div>
                   </div>
                 )}
                 {/* Toggle switch for BSN tab */}
                 {activeTab === 'bsn' && (
                   <div style={{ display: 'flex', justifyContent: 'center', margin: '1.5rem 0' }}>
-                    <button
-                      onClick={() => setActiveBsnMode('genereer')}
-                      style={{
-                        background: activeBsnMode === 'genereer' ? theme.colors.primary : theme.colors.surface,
-                        color: activeBsnMode === 'genereer' ? theme.colors.background : theme.colors.primary,
-                        border: 'none',
-                        borderRadius: '0.75rem 0 0 0.75rem',
-                        padding: '0.75rem 2rem',
-                        fontWeight: 600,
-                        fontSize: '1rem',
-                        cursor: 'pointer',
-                        transition: 'background 0.2s',
-                        outline: 'none',
-                      }}
-                    >
-                      Genereer
-                    </button>
-                    <button
-                      onClick={() => setActiveBsnMode('controleer')}
-                      style={{
-                        background: activeBsnMode === 'controleer' ? theme.colors.primary : theme.colors.surface,
-                        color: activeBsnMode === 'controleer' ? theme.colors.background : theme.colors.primary,
-                        border: 'none',
-                        borderRadius: '0 0.75rem 0.75rem 0',
-                        padding: '0.75rem 2rem',
-                        fontWeight: 600,
-                        fontSize: '1rem',
-                        cursor: 'pointer',
-                        transition: 'background 0.2s',
-                        outline: 'none',
-                        marginLeft: '-1px',
-                      }}
-                    >
-                      Controleer
-                    </button>
-                  </div>
-                )}
-                {/* Toggle switch for Postcode tab */}
-                {activeTab === 'postcode' && (
-                  <div style={{ display: 'flex', justifyContent: 'center', margin: '1.5rem 0' }}>
-                    <button
-                      onClick={() => setActivePostcodeMode('genereer')}
-                      style={{
-                        background: activePostcodeMode === 'genereer' ? theme.colors.primary : theme.colors.surface,
-                        color: activePostcodeMode === 'genereer' ? theme.colors.background : theme.colors.primary,
-                        border: 'none',
-                        borderRadius: '0.75rem 0 0 0.75rem',
-                        padding: '0.75rem 2rem',
-                        fontWeight: 600,
-                        fontSize: '1rem',
-                        cursor: 'pointer',
-                        transition: 'background 0.2s',
-                        outline: 'none',
-                      }}
-                    >
-                      Genereer
-                    </button>
-                    <button
-                      onClick={() => setActivePostcodeMode('controleer')}
-                      style={{
-                        background: activePostcodeMode === 'controleer' ? theme.colors.primary : theme.colors.surface,
-                        color: activePostcodeMode === 'controleer' ? theme.colors.background : theme.colors.primary,
-                        border: 'none',
-                        borderRadius: '0 0.75rem 0.75rem 0',
-                        padding: '0.75rem 2rem',
-                        fontWeight: 600,
-                        fontSize: '1rem',
-                        cursor: 'pointer',
-                        transition: 'background 0.2s',
-                        outline: 'none',
-                        marginLeft: '-1px',
-                      }}
-                    >
-                      Controleer
-                    </button>
+                    <div style={{ display: 'flex', border: `2px solid ${theme.colors.secondary}`, borderRadius: '0.75rem', overflow: 'hidden' }}>
+                      <button
+                        onClick={() => setActiveBsnMode('genereer')}
+                        style={{
+                          background: activeBsnMode === 'genereer' ? theme.colors.primary : theme.colors.surface,
+                          color: activeBsnMode === 'genereer' ? theme.colors.background : theme.colors.primary,
+                          border: 'none',
+                          borderRadius: '0',
+                          padding: '0.75rem 2rem',
+                          fontWeight: 600,
+                          fontSize: '1rem',
+                          cursor: 'pointer',
+                          transition: 'background 0.2s',
+                          outline: 'none',
+                        }}
+                      >
+                        Genereer
+                      </button>
+                      <button
+                        onClick={() => setActiveBsnMode('controleer')}
+                        style={{
+                          background: activeBsnMode === 'controleer' ? theme.colors.primary : theme.colors.surface,
+                          color: activeBsnMode === 'controleer' ? theme.colors.background : theme.colors.primary,
+                          border: 'none',
+                          borderRadius: '0',
+                          padding: '0.75rem 2rem',
+                          fontWeight: 600,
+                          fontSize: '1rem',
+                          cursor: 'pointer',
+                          transition: 'background 0.2s',
+                          outline: 'none',
+                          borderLeft: `1px solid ${theme.colors.secondary}`,
+                        }}
+                      >
+                        Controleer
+                      </button>
+                    </div>
                   </div>
                 )}
                 <div className={`${styles.tabContent} ${tabAnim ? styles.tabContentAnim : ''}`}>
@@ -447,26 +594,14 @@ function App() {
                           ))}
                         </select>
                         <button
+                          className="learn-more"
                           onClick={handleGenerate}
-                          style={{
-                            background: theme.colors.primary,
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: '0.75rem',
-                            padding: '0.75rem 2rem',
-                            fontWeight: 600,
-                            fontSize: '1rem',
-                            cursor: 'pointer',
-                            transition: 'background 0.2s',
-                            outline: 'none',
-                            width: 220
-                          }}
                         >
                           Genereer
                         </button>
                         {data.mobile && (
                           <div style={{ marginTop: 24, width: '100%' }}>
-                            <Card label="Mobiel nummer" value={data.mobile} onCopy={handleCopy} copied={!!copied.mobile} />
+                            <Card label="Mobiel nummer" value={formatPhoneNumber(data.mobile)} onCopy={handleCopy} copied={!!copied.mobile} />
                           </div>
                         )}
                       </div>
@@ -505,26 +640,14 @@ function App() {
                           ))}
                         </select>
                         <button
+                          className="learn-more"
                           onClick={handleGenerate}
-                          style={{
-                            background: theme.colors.primary,
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: '0.75rem',
-                            padding: '0.75rem 2rem',
-                            fontWeight: 600,
-                            fontSize: '1rem',
-                            cursor: 'pointer',
-                            transition: 'background 0.2s',
-                            outline: 'none',
-                            width: 220
-                          }}
                         >
                           Genereer
                         </button>
                         {data.landline && (
                           <div style={{ marginTop: 24, width: '100%' }}>
-                            <Card label="Vast telefoonnummer" value={data.landline} onCopy={handleCopy} copied={!!copied.landline} />
+                            <Card label="Vast telefoonnummer" value={formatPhoneNumber(data.landline)} onCopy={handleCopy} copied={!!copied.landline} />
                           </div>
                         )}
                       </div>
@@ -556,20 +679,7 @@ function App() {
                             <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', justifyContent: 'center' }}>
                               <div style={{ height: 0, minHeight: 0, flex: 1 }} />
                               <button
-                                style={{
-                                  background: theme.colors.primary,
-                                  color: '#fff',
-                                  border: 'none',
-                                  borderRadius: '0.75rem',
-                                  padding: '1rem 2.5rem',
-                                  fontSize: '1.15rem',
-                                  fontWeight: 600,
-                                  cursor: 'pointer',
-                                  marginBottom: 0,
-                                  transition: 'background 0.2s',
-                                }}
-                                onMouseOver={e => (e.currentTarget.style.background = '#2563eb')}
-                                onMouseOut={e => (e.currentTarget.style.background = theme.colors.primary)}
+                                className="learn-more"
                                 onClick={handleGenerate}
                               >
                                 Genereer
@@ -704,20 +814,7 @@ function App() {
                             <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', justifyContent: 'center' }}>
                               <div style={{ height: 0, minHeight: 0, flex: 1 }} />
                               <button
-                                style={{
-                                  background: theme.colors.primary,
-                                  color: '#fff',
-                                  border: 'none',
-                                  borderRadius: '0.75rem',
-                                  padding: '1rem 2.5rem',
-                                  fontSize: '1.15rem',
-                                  fontWeight: 600,
-                                  cursor: 'pointer',
-                                  marginBottom: 0,
-                                  transition: 'background 0.2s',
-                                }}
-                                onMouseOver={e => (e.currentTarget.style.background = '#2563eb')}
-                                onMouseOut={e => (e.currentTarget.style.background = theme.colors.primary)}
+                                className="learn-more"
                                 onClick={handleGenerate}
                               >
                                 Genereer
@@ -822,150 +919,6 @@ function App() {
                       )}
                     </div>
                   )}
-                  {activeTab === 'postcode' && (
-                    <div
-                      style={{
-                        background: theme.colors.surface,
-                        borderRadius: '1.5rem',
-                        boxShadow: '0 8px 32px 0 rgba(30,59,76,0.10), 0 4px 12px 0 rgba(0,0,0,0.05)',
-                        border: `1.5px solid ${theme.colors.secondary}`,
-                        maxWidth: 1000,
-                        margin: '0 auto',
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'stretch',
-                        justifyContent: 'center',
-                        padding: '2.5rem',
-                        gap: 0,
-                        fontFamily: 'Inter, Roboto, system-ui, sans-serif',
-                        minHeight: 420,
-                        transition: 'box-shadow 0.2s',
-                      }}
-                    >
-                      {activePostcodeMode === 'genereer' && (
-                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '0 2rem' }}>
-                          <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', gap: '0.75rem' }}>
-                            <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', justifyContent: 'center' }}>
-                              <div style={{ height: 0, minHeight: 0, flex: 1 }} />
-                              <button
-                                style={{
-                                  background: theme.colors.primary,
-                                  color: '#fff',
-                                  border: 'none',
-                                  borderRadius: '0.75rem',
-                                  padding: '1rem 2.5rem',
-                                  fontSize: '1.15rem',
-                                  fontWeight: 600,
-                                  cursor: 'pointer',
-                                  marginBottom: 0,
-                                  transition: 'background 0.2s',
-                                }}
-                                onMouseOver={e => (e.currentTarget.style.background = '#2563eb')}
-                                onMouseOut={e => (e.currentTarget.style.background = theme.colors.primary)}
-                                onClick={handleGenerate}
-                              >
-                                Genereer
-                              </button>
-                              <div style={{ height: 0, minHeight: 0, flex: 1 }} />
-                            </div>
-                            {data.postcode && (
-                              <div style={{ width: '100%' }}>
-                                <Card label="Postcode" value={data.postcode} onCopy={handleCopy} copied={!!copied.postcode} />
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                      {activePostcodeMode === 'controleer' && (
-                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '0 2rem', minWidth: 0, maxWidth: 480 }}>
-                          <div style={{ width: '100%', maxWidth: 320 }}>
-                            <input
-                              style={{
-                                width: '100%',
-                                maxWidth: 320,
-                                minWidth: 220,
-                                padding: '0.85rem 1rem',
-                                borderRadius: '0.75rem',
-                                border: '1px solid #cbd5e1',
-                                fontSize: '1rem',
-                                fontFamily: 'inherit',
-                                marginBottom: '2rem',
-                              }}
-                              type="text"
-                              placeholder="Check postcode..."
-                              value={input}
-                              onChange={e => setInput(e.target.value)}
-                            />
-                            <div style={{ display: 'flex', alignItems: 'flex-start', width: '100%' }}>
-                              <div style={{ height: 0, minHeight: 0, flex: 1 }} />
-                              <button
-                                style={{
-                                  background: theme.colors.primary,
-                                  color: '#fff',
-                                  border: 'none',
-                                  borderRadius: '0.75rem',
-                                  padding: '1rem 2.5rem',
-                                  fontSize: '1.15rem',
-                                  fontWeight: 600,
-                                  cursor: 'pointer',
-                                  marginBottom: '2rem',
-                                  transition: 'background 0.2s',
-                                  whiteSpace: 'nowrap',
-                                  width: '100%',
-                                  maxWidth: 320,
-                                }}
-                                onMouseOver={e => (e.currentTarget.style.background = '#2563eb')}
-                                onMouseOut={e => (e.currentTarget.style.background = theme.colors.primary)}
-                                onClick={handleCheckPostcode}
-                              >
-                                Check geldig postcode
-                              </button>
-                              <div style={{ height: 0, minHeight: 0, flex: 1 }} />
-                            </div>
-                          </div>
-                          <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end', width: '100%', maxWidth: 320 }}>
-                            {data.postcodeCheck && (
-                              <div
-                                style={{
-                                  background: data.postcodeCheck === 'Geldige postcode' ? '#d1fae5' : '#fee2e2', // groen of rood
-                                  border: `2px solid ${data.postcodeCheck === 'Geldige postcode' ? '#10b981' : '#f87171'}`, // groene of rode border
-                                  borderRadius: '1rem',
-                                  boxShadow: '0 2px 12px 0 rgba(30,58,138,0.07)',
-                                  padding: '1.5rem',
-                                  width: '100%',
-                                  minWidth: 0,
-                                  display: 'flex',
-                                  flexDirection: 'column',
-                                  alignItems: 'center',
-                                  marginBottom: 0,
-                                  transition: 'background 0.2s',
-                                }}
-                              >
-                                <div style={{ fontWeight: 600, color: '#1e3a8a', marginBottom: '0.5rem', fontSize: '0.95rem' }}>Check geldig postcode</div>
-                                <div style={{ fontSize: '1.15rem', marginBottom: '1rem', wordBreak: 'break-all' }}>{data.postcodeCheck}</div>
-                                <button
-                                  style={{
-                                    background: '#e0e7ef',
-                                    color: '#1e3a8a',
-                                    border: 'none',
-                                    borderRadius: '0.5rem',
-                                    padding: '0.5rem 1.5rem',
-                                    fontSize: '0.95rem',
-                                    fontWeight: 500,
-                                    cursor: 'pointer',
-                                    marginTop: '0.5rem',
-                                  }}
-                                  onClick={handleCopy}
-                                >
-                                  Kopieer Check geldig postcode naar klembord
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
                   {activeTab === 'adres' && (
                     <div
                       style={{
@@ -1008,20 +961,35 @@ function App() {
                           type="button"
                           aria-label="Haal een random plaatsnaam op"
                           style={{
-                            background: theme.colors.primary,
-                            color: theme.colors.textOnPrimary,
-                            border: 'none',
-                            borderRadius: '50%',
-                            width: 38,
-                            height: 38,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: 20,
+                            color: 'white',
+                            backgroundColor: theme.colors.primary,
+                            fontWeight: 500,
+                            borderRadius: '0.5rem',
+                            fontSize: '0.9rem',
+                            lineHeight: '1.5rem',
+                            paddingLeft: '1.5rem',
+                            paddingRight: '1.5rem',
+                            paddingTop: '0.6rem',
+                            paddingBottom: '0.6rem',
                             cursor: plaatsnaamLoading ? 'wait' : 'pointer',
-                            transition: 'background 0.2s, transform 0.2s',
+                            textAlign: 'center' as const,
+                            marginRight: '0.5rem',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            border: 'none',
                             opacity: plaatsnaamLoading ? 0.7 : 1,
-                            transform: plaatsnaamLoading ? 'scale(0.95)' : 'none',
+                            transition: 'background-color 0.2s, opacity 0.2s',
+                            overflow: 'hidden',
+                            position: 'relative',
+                          }}
+                          className="refresh-button"
+                          onMouseEnter={(e) => {
+                            if (!plaatsnaamLoading) {
+                              e.currentTarget.style.backgroundColor = theme.colors.secondary;
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = theme.colors.primary;
                           }}
                           disabled={plaatsnaamLoading}
                           onClick={async () => {
@@ -1031,41 +999,87 @@ function App() {
                             setPlaatsnaamLoading(false);
                           }}
                         >
-                          {plaatsnaamLoading ? (
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ animation: 'spin 1s linear infinite' }}>
-                              <circle cx="10" cy="10" r="8" stroke="white" strokeWidth="3" opacity="0.3" />
-                              <path d="M18 10a8 8 0 0 0-8-8" stroke="white" strokeWidth="3" strokeLinecap="round" />
-                              <style>{'@keyframes spin { 100% { transform: rotate(360deg); } }'}</style>
-                            </svg>
-                          ) : (
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <circle cx="10" cy="10" r="9" stroke="white" strokeWidth="2" fill="none" />
-                              <path d="M6 10a4 4 0 0 1 7.5-2.5" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round"/>
-                            </svg>
-                          )}
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            fill="currentColor"
+                            viewBox="0 0 16 16"
+                            style={{
+                              display: 'inline',
+                              width: '1.1rem',
+                              height: '1.1rem',
+                              marginRight: '0.5rem',
+                              color: 'white',
+                              animation: plaatsnaamLoading ? 'spin_357 1s linear infinite' : 'none',
+                            }}
+                          >
+                            <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"></path>
+                            <path
+                              fillRule="evenodd"
+                              d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"
+                            ></path>
+                            <style>{`
+                              @keyframes spin_357 {
+                                from {
+                                  transform: rotate(0deg);
+                                }
+                                to {
+                                  transform: rotate(360deg);
+                                }
+                              }
+
+                              .refresh-button span {
+                                position: relative;
+                                background: inherit;
+                              }
+
+                              .refresh-button span::before {
+                                position: absolute;
+                                content: "";
+                                background: inherit;
+                              }
+
+                              .refresh-button:hover span::before {
+                                animation: chitchat linear both 1.2s;
+                              }
+
+                              @keyframes chitchat {
+                                0% { content: "#"; }
+                                5% { content: "."; }
+                                10% { content: "^{"; }
+                                15% { content: "-!"; }
+                                20% { content: "#$_"; }
+                                25% { content: "№:0"; }
+                                30% { content: "#{+."; }
+                                35% { content: "@}-?"; }
+                                40% { content: "?{4@%"; }
+                                45% { content: "=.,^!"; }
+                                50% { content: "?2@%"; }
+                                55% { content: "\\;1}]"; }
+                                60% { content: "?{%:%"; right: 0; }
+                                65% { content: "|{f[4"; right: 0; }
+                                70% { content: "{4%0%"; right: 0; }
+                                75% { content: "'1_0<"; right: 0; }
+                                80% { content: "{0%"; right: 0; }
+                                85% { content: "]>'"; right: 0; }
+                                90% { content: "4"; right: 0; }
+                                95% { content: "2"; right: 0; }
+                                100% { content: ""; right: 0; }
+                              }
+                            `}</style>
+                          </svg>
+                          <span>Refresh</span>
                         </button>
                       </div>
                       <button
+                        className="learn-more"
                         onClick={handleAdresGenereer}
-                        style={{
-                          background: theme.colors.primary,
-                          color: '#fff',
-                          border: 'none',
-                          borderRadius: '0.75rem',
-                          padding: '0.75rem 2rem',
-                          fontWeight: 600,
-                          fontSize: '1rem',
-                          cursor: 'pointer',
-                          transition: 'background 0.2s',
-                          outline: 'none',
-                          marginBottom: 24,
-                          width: 320
-                        }}
                       >
                         Genereer adres
                       </button>
                       {adresResult && (
-                        <div style={{ width: '100%', marginTop: 16 }}>
+                        <div style={{ width: '100%', marginTop: 32 }}>
                           <div style={{
                             background: '#fff',
                             border: '1.5px solid #a7d0ff',

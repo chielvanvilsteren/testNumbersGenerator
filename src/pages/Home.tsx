@@ -32,24 +32,6 @@ const HeroSubtitle = styled.p`
   font-family: 'JetBrains Mono', monospace;
 `;
 
-const MainButton = styled.button`
-  background: ${({ theme }) => `linear-gradient(90deg, ${theme.colors.primary} 0%, ${theme.colors.secondary} 100%)`};
-  color: ${({ theme }) => theme.colors.background};
-  border: none;
-  border-radius: 32px;
-  padding: 18px 48px;
-  font-size: 22px;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 4px 24px 0 rgba(30,59,76,0.12);
-  font-family: 'JetBrains Mono', monospace;
-  transition: background 0.2s, color 0.2s;
-  &:hover {
-    background: ${({ theme }) => theme.colors.secondary};
-    color: ${({ theme }) => theme.colors.surface};
-  }
-`;
-
 const BlinkingCursor = styled.span`
   display: inline-block;
   width: 1ch;
@@ -64,10 +46,85 @@ const BlinkingCursor = styled.span`
   }
 `;
 
+// UI Button CSS styles
+const UIButtonStyles = `
+  /* From Uiverse.io by Galahhad */ 
+  .ui-btn {
+    --btn-default-bg: rgb(41, 41, 41);
+    --btn-padding: 15px 20px;
+    --btn-hover-bg: rgb(51, 51, 51);
+    --btn-transition: .3s;
+    --btn-letter-spacing: .1rem;
+    --btn-animation-duration: 1.2s;
+    --btn-shadow-color: rgba(0, 0, 0, 0.137);
+    --btn-shadow: 0 2px 10px 0 var(--btn-shadow-color);
+    --hover-btn-color: #FAC921;
+    --default-btn-color: #fff;
+    --font-size: 16px;
+    --font-weight: 600;
+    --font-family: Menlo,Roboto Mono,monospace;
+  }
+
+  .ui-btn {
+    box-sizing: border-box;
+    padding: var(--btn-padding);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--default-btn-color);
+    font: var(--font-weight) var(--font-size) var(--font-family);
+    background: var(--btn-default-bg);
+    border: none;
+    cursor: pointer;
+    transition: var(--btn-transition);
+    overflow: hidden;
+    box-shadow: var(--btn-shadow);
+  }
+
+  .ui-btn span {
+    letter-spacing: var(--btn-letter-spacing);
+    transition: var(--btn-transition);
+    box-sizing: border-box;
+    position: relative;
+    background: inherit;
+  }
+
+  .ui-btn:hover, .ui-btn:focus {
+    background: var(--btn-hover-bg);
+  }
+
+  .ui-btn:hover span, .ui-btn:focus span {
+    color: var(--hover-btn-color);
+  }
+
+  .char {
+    display: inline-block;
+    position: relative;
+    transition: all 0.1s ease;
+  }
+
+  .char.animating {
+    color: var(--hover-btn-color);
+  }
+`;
+
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const heroRef = useRef<HTMLDivElement>(null);
   const theme = useTheme();
+
+  useEffect(() => {
+    // Add the CSS styles to the document
+    const styleSheet = document.createElement('style');
+    styleSheet.type = 'text/css';
+    styleSheet.innerText = UIButtonStyles;
+    document.head.appendChild(styleSheet);
+
+    // Cleanup styles when component unmounts
+    return () => {
+      document.head.removeChild(styleSheet);
+    };
+  }, []);
 
   useEffect(() => {
     if (!heroRef.current) return;
@@ -125,6 +182,42 @@ const Home: React.FC = () => {
     };
   }, [theme.colors.surface]);
 
+  // Function to wrap text in span elements for character animation
+  const wrapTextInChars = (text: string) => {
+    return text.split('').map((char, index) => (
+      <span key={index} className="char" data-original={char}>
+        {char === ' ' ? '\u00A0' : char}
+      </span>
+    ));
+  };
+
+  // Function to animate characters
+  const animateChars = (buttonElement: HTMLButtonElement) => {
+    const chars = buttonElement.querySelectorAll('.char') as NodeListOf<HTMLSpanElement>;
+    const symbols = ['#', '@', '№', '{', '}', '?', '!', '^', '~', '%', '|', '&', '*', '$', '>', '4', '2'];
+
+    chars.forEach((char, index) => {
+      const originalChar = char.getAttribute('data-original') || char.textContent || '';
+      char.classList.add('animating');
+
+      let animationStep = 0;
+      const maxSteps = 8 + Math.random() * 4; // Varieer de animatieduur per karakter
+
+      const interval = setInterval(() => {
+        if (animationStep < maxSteps) {
+          // Toon random symbool
+          char.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+          animationStep++;
+        } else {
+          // Terug naar originele karakter
+          char.textContent = originalChar === ' ' ? '\u00A0' : originalChar;
+          char.classList.remove('animating');
+          clearInterval(interval);
+        }
+      }, 80 + index * 20); // Stagger de animatie per karakter
+    });
+  };
+
   return (
     <PageBg>
       {/* Hero Section with animated cubes and text in front */}
@@ -149,16 +242,28 @@ const Home: React.FC = () => {
       </section>
       {/* Knoppen onder de hero, gecentreerd naast elkaar */}
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 32, marginTop: 48 }}>
-        <MainButton
+        <button
+          className="ui-btn"
           onClick={() => navigate('/generators')}
+          onMouseEnter={(e) => {
+            animateChars(e.currentTarget as HTMLButtonElement);
+          }}
         >
-          Start Genereren
-        </MainButton>
-        <MainButton
+          <span>
+            {wrapTextInChars("Start Genereren")}
+          </span>
+        </button>
+        <button
+          className="ui-btn"
           onClick={() => navigate('/npm')}
+          onMouseEnter={(e) => {
+            animateChars(e.currentTarget as HTMLButtonElement);
+          }}
         >
-          Bekijk NPM info
-        </MainButton>
+          <span>
+            {wrapTextInChars("Bekijk NPM info")}
+          </span>
+        </button>
       </div>
     </PageBg>
   );

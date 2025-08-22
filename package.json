@@ -18,7 +18,7 @@
     "react-router-dom": "^6.30.1",
     "react-scripts": "5.0.1",
     "styled-components": "^6.1.19",
-    "test-numbers-generator": "^1.2.2",
+    "test-numbers-generator": "^1.2.3",
     "three": "^0.179.1",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
