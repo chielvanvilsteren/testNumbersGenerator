@@ -137,7 +137,6 @@ const Tooltip = styled.div<{ show: boolean }>`
 
 const Card: React.FC<CardProps> = ({ label, value, onCopy, copied }) => {
   const [showTooltip, setShowTooltip] = useState(false);
-  const theme = useTheme();
 
   return (
     <CardContainer>
