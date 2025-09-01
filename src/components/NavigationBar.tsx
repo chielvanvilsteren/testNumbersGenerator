@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import styled from 'styled-components';
 
@@ -181,10 +181,6 @@ const NavigationBar: React.FC = () => {
 
   const handleLogin = () => {
     navigate('/login');
-  };
-
-  const isActive = (path: string) => {
-    return location.pathname === path;
   };
 
   return (
