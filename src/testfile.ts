@@ -1,8 +1,7 @@
 import {
     generateTestBSN,
     generateTestDutchIBAN,
-    generateTestMobileNumber,
-    testNumbersGenerator
+    generateTestMobileNumber
 } from "test-numbers-generator";
 import {getRandomAdresInPlaatsnaam, getRandomPlaatsnaam} from "test-numbers-generator/dist/postcodeService";
 
