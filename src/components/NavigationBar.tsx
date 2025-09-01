@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import {useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import styled from 'styled-components';
 
 const Nav = styled.nav`
@@ -95,15 +96,65 @@ const GitHubButton = styled.button`
   }
 `;
 
+const AuthSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: 1rem;
+`;
+
+const UserInfo = styled.span`
+  color: #F9F4F1;
+  font-family: 'JetBrains Mono', Menlo, Monaco, Consolas, monospace;
+  font-size: 0.9rem;
+  font-weight: 500;
+`;
+
+const AdminBadge = styled.span`
+  background: linear-gradient(90deg, #48bb78 0%, #38a169 100%);
+  color: white;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.3rem;
+  margin-left: 0.5rem;
+  font-weight: 600;
+`;
+
+const AuthButton = styled.button`
+  background: ${({ theme }) => theme.colors.secondary};
+  color: ${({ theme }) => theme.colors.background};
+  font-family: 'JetBrains Mono', Menlo, Monaco, Consolas, monospace;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.15s;
+  outline: none;
+
+  &:hover {
+    transform: translateY(-1px);
+    background: ${({ theme }) => theme.colors.surface};
+  }
+`;
+
 const NavigationBar: React.FC = () => {
   const [starCount, setStarCount] = useState<number>(0);
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
+
   const tabs = [
     { label: 'Home', path: '/' },
     { label: 'Generators', path: '/generators' },
     { label: 'NPM', path: '/npm' },
   ];
+
+  // Add Metrics tab for admin users
+  if (isAuthenticated && isAdmin) {
+    tabs.push({ label: '📈 Metrics', path: '/metrics' });
+  }
 
   // Fetch GitHub stars
   useEffect(() => {
@@ -123,6 +174,19 @@ const NavigationBar: React.FC = () => {
     fetchStarCount();
   }, []);
 
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+  const handleLogin = () => {
+    navigate('/login');
+  };
+
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
+
   return (
     <Nav>
       <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginLeft: '2.5rem' }}>
@@ -141,7 +205,27 @@ const NavigationBar: React.FC = () => {
           </NavButton>
         ))}
       </div>
-      <div style={{ marginRight: '2.5rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', marginRight: '2.5rem', gap: '1rem' }}>
+        {/* Authentication Section */}
+        <AuthSection>
+          {isAuthenticated ? (
+            <>
+              <UserInfo>
+                Welkom, {user?.name || user?.email}
+                {isAdmin && <AdminBadge>Admin</AdminBadge>}
+              </UserInfo>
+              <AuthButton onClick={handleLogout}>
+                🚪 Logout
+              </AuthButton>
+            </>
+          ) : (
+            <AuthButton onClick={handleLogin}>
+              Login
+            </AuthButton>
+          )}
+        </AuthSection>
+
+        {/* GitHub Button */}
         <GitHubButton
           onClick={() => window.open('https://github.com/chielvanvilsteren/testNumbersGenerator', '_blank')}
         >

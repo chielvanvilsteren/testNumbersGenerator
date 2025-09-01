@@ -5,6 +5,10 @@ import styles from './App.module.css';
 import NavigationBar from './components/NavigationBar';
 import Home from './pages/Home';
 import Npm from './pages/Npm';
+import Login from './pages/Login';
+import Metrics from './pages/Metrics';
+import ProtectedRoute from './components/ProtectedRoute';
+import { AuthProvider } from './context/AuthContext';
 import {
   generateTestMobileNumber,
   generateTestLandlineNumber,
@@ -406,313 +410,320 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <Router>
-        <NavigationBar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/npm" element={<Npm />} />
-          <Route path="/generators" element={
-            <GeneratorBg>
-              <GeneratorContainer>
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '2rem 0', flexDirection: 'column' }}>
-                  <GeneratorTitle>
-                    Test Numbers Generator
-                    <span className="blinkingCursor" style={{ display: 'inline-block', width: '1ch', marginLeft: '0.2ch', background: 'transparent', color: '#111', animation: 'blink 1s steps(1) infinite', fontWeight: 400 }}>|</span>
-                  </GeneratorTitle>
-                </div>
-                <GeneratorTabs>
-                  {TABS.map(tab => (
-                    <GeneratorTabButton
-                      key={tab.key}
-                      active={activeTab === tab.key}
-                      onClick={() => handleTabSwitch(tab.key)}
-                      type="button"
-                    >
-                      {tab.label}
-                    </GeneratorTabButton>
-                  ))}
-                </GeneratorTabs>
-                {/* Toggle switch for phone number formatting */}
-                {(activeTab === 'mobile' || activeTab === 'landline') && (
-                  <div style={{ display: 'flex', justifyContent: 'center', margin: '1.5rem 0', flexDirection: 'column', alignItems: 'center' }}>
-                    <div style={{ marginBottom: '0.5rem', fontSize: '0.9rem', color: theme.colors.secondary, fontWeight: 500 }}>
-                      Nummer formaat
-                    </div>
-                    <div style={{ display: 'flex', border: `2px solid ${theme.colors.secondary}`, borderRadius: '0.75rem', overflow: 'hidden' }}>
-                      <button
-                        onClick={() => setInternationalFormat(true)}
-                        style={{
-                          background: internationalFormat ? theme.colors.primary : theme.colors.surface,
-                          color: internationalFormat ? theme.colors.background : theme.colors.primary,
-                          border: 'none',
-                          borderRadius: '0',
-                          padding: '0.75rem 1.2rem',
-                          fontWeight: 600,
-                          fontSize: '0.85rem',
-                          cursor: 'pointer',
-                          transition: 'background 0.2s',
-                          outline: 'none',
-                        }}
-                      >
-                        Internationaal
-                      </button>
-                      <button
-                        onClick={() => setInternationalFormat(false)}
-                        style={{
-                          background: !internationalFormat ? theme.colors.primary : theme.colors.surface,
-                          color: !internationalFormat ? theme.colors.background : theme.colors.primary,
-                          border: 'none',
-                          borderRadius: '0',
-                          padding: '0.75rem 1.2rem',
-                          fontWeight: 600,
-                          fontSize: '0.85rem',
-                          cursor: 'pointer',
-                          transition: 'background 0.2s',
-                          outline: 'none',
-                          borderLeft: `1px solid ${theme.colors.secondary}`,
-                        }}
-                      >
-                        Lokaal
-                      </button>
-                    </div>
+        <AuthProvider>
+          <NavigationBar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/npm" element={<Npm />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/metrics" element={
+              <ProtectedRoute>
+                <Metrics />
+              </ProtectedRoute>
+            } />
+            <Route path="/generators" element={
+              <GeneratorBg>
+                <GeneratorContainer>
+                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '2rem 0', flexDirection: 'column' }}>
+                    <GeneratorTitle>
+                      Test Numbers Generator
+                      <span className="blinkingCursor" style={{ display: 'inline-block', width: '1ch', marginLeft: '0.2ch', background: 'transparent', color: '#111', animation: 'blink 1s steps(1) infinite', fontWeight: 400 }}>|</span>
+                    </GeneratorTitle>
                   </div>
-                )}
-                {/* Toggle switch for IBAN tab */}
-                {activeTab === 'iban' && (
-                  <div style={{ display: 'flex', justifyContent: 'center', margin: '1.5rem 0' }}>
-                    <div style={{ display: 'flex', border: `2px solid ${theme.colors.secondary}`, borderRadius: '0.75rem', overflow: 'hidden' }}>
-                      <button
-                        onClick={() => setActiveIbanMode('genereer')}
-                        style={{
-                          background: activeIbanMode === 'genereer' ? theme.colors.primary : theme.colors.surface,
-                          color: activeIbanMode === 'genereer' ? theme.colors.background : theme.colors.primary,
-                          border: 'none',
-                          borderRadius: '0',
-                          padding: '0.75rem 2rem',
-                          fontWeight: 600,
-                          fontSize: '1rem',
-                          cursor: 'pointer',
-                          transition: 'background 0.2s',
-                          outline: 'none',
-                        }}
+                  <GeneratorTabs>
+                    {TABS.map(tab => (
+                      <GeneratorTabButton
+                        key={tab.key}
+                        active={activeTab === tab.key}
+                        onClick={() => handleTabSwitch(tab.key)}
+                        type="button"
                       >
-                        Genereer
-                      </button>
-                      <button
-                        onClick={() => setActiveIbanMode('controleer')}
-                        style={{
-                          background: activeIbanMode === 'controleer' ? theme.colors.primary : theme.colors.surface,
-                          color: activeIbanMode === 'controleer' ? theme.colors.background : theme.colors.primary,
-                          border: 'none',
-                          borderRadius: '0',
-                          padding: '0.75rem 2rem',
-                          fontWeight: 600,
-                          fontSize: '1rem',
-                          cursor: 'pointer',
-                          transition: 'background 0.2s',
-                          outline: 'none',
-                          borderLeft: `1px solid ${theme.colors.secondary}`,
-                        }}
-                      >
-                        Controleer
-                      </button>
-                    </div>
-                  </div>
-                )}
-                {/* Toggle switch for BSN tab */}
-                {activeTab === 'bsn' && (
-                  <div style={{ display: 'flex', justifyContent: 'center', margin: '1.5rem 0' }}>
-                    <div style={{ display: 'flex', border: `2px solid ${theme.colors.secondary}`, borderRadius: '0.75rem', overflow: 'hidden' }}>
-                      <button
-                        onClick={() => setActiveBsnMode('genereer')}
-                        style={{
-                          background: activeBsnMode === 'genereer' ? theme.colors.primary : theme.colors.surface,
-                          color: activeBsnMode === 'genereer' ? theme.colors.background : theme.colors.primary,
-                          border: 'none',
-                          borderRadius: '0',
-                          padding: '0.75rem 2rem',
-                          fontWeight: 600,
-                          fontSize: '1rem',
-                          cursor: 'pointer',
-                          transition: 'background 0.2s',
-                          outline: 'none',
-                        }}
-                      >
-                        Genereer
-                      </button>
-                      <button
-                        onClick={() => setActiveBsnMode('controleer')}
-                        style={{
-                          background: activeBsnMode === 'controleer' ? theme.colors.primary : theme.colors.surface,
-                          color: activeBsnMode === 'controleer' ? theme.colors.background : theme.colors.primary,
-                          border: 'none',
-                          borderRadius: '0',
-                          padding: '0.75rem 2rem',
-                          fontWeight: 600,
-                          fontSize: '1rem',
-                          cursor: 'pointer',
-                          transition: 'background 0.2s',
-                          outline: 'none',
-                          borderLeft: `1px solid ${theme.colors.secondary}`,
-                        }}
-                      >
-                        Controleer
-                      </button>
-                    </div>
-                  </div>
-                )}
-                <div className={`${styles.tabContent} ${tabAnim ? styles.tabContentAnim : ''}`}>
-                  {activeTab === 'mobile' && (
-                    <div
-                      style={{
-                        background: theme.colors.surface,
-                        borderRadius: '1.5rem',
-                        boxShadow: '0 8px 32px 0 rgba(30,59,76,0.10), 0 4px 12px 0 rgba(0,0,0,0.05)',
-                        border: `1.5px solid ${theme.colors.secondary}`,
-                        maxWidth: 1000,
-                        margin: '0 auto',
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'stretch',
-                        justifyContent: 'center',
-                        padding: '2.5rem',
-                        gap: 0,
-                        fontFamily: 'Inter, Roboto, system-ui, sans-serif',
-                        minHeight: 420,
-                        transition: 'box-shadow 0.2s',
-                      }}
-                    >
-                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                        <label htmlFor="mobile-country-select" style={{ fontWeight: 600, marginBottom: 8 }}>Land</label>
-                        <select
-                          id="mobile-country-select"
-                          value={mobileCountry}
-                          onChange={e => setMobileCountry(e.target.value as SupportedCountry)}
-                          style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', border: '1px solid #a7d0ff', fontSize: '1rem', marginBottom: 24, width: 220 }}
-                        >
-                          {mobileCountries.map(option => (
-                            <option key={option.value} value={option.value}>{option.label}</option>
-                          ))}
-                        </select>
+                        {tab.label}
+                      </GeneratorTabButton>
+                    ))}
+                  </GeneratorTabs>
+                  {/* Toggle switch for phone number formatting */}
+                  {(activeTab === 'mobile' || activeTab === 'landline') && (
+                    <div style={{ display: 'flex', justifyContent: 'center', margin: '1.5rem 0', flexDirection: 'column', alignItems: 'center' }}>
+                      <div style={{ marginBottom: '0.5rem', fontSize: '0.9rem', color: theme.colors.secondary, fontWeight: 500 }}>
+                        Nummer formaat
+                      </div>
+                      <div style={{ display: 'flex', border: `2px solid ${theme.colors.secondary}`, borderRadius: '0.75rem', overflow: 'hidden' }}>
                         <button
-                          className="learn-more"
-                          onClick={handleGenerate}
+                          onClick={() => setInternationalFormat(true)}
+                          style={{
+                            background: internationalFormat ? theme.colors.primary : theme.colors.surface,
+                            color: internationalFormat ? theme.colors.background : theme.colors.primary,
+                            border: 'none',
+                            borderRadius: '0',
+                            padding: '0.75rem 1.2rem',
+                            fontWeight: 600,
+                            fontSize: '0.85rem',
+                            cursor: 'pointer',
+                            transition: 'background 0.2s',
+                            outline: 'none',
+                          }}
                         >
-                          Genereer
+                          Internationaal
                         </button>
-                        {data.mobile && (
-                          <div style={{ marginTop: 24, width: '100%' }}>
-                            <Card label="Mobiel nummer" value={formatPhoneNumber(data.mobile)} onCopy={handleCopy} copied={!!copied.mobile} />
-                          </div>
-                        )}
+                        <button
+                          onClick={() => setInternationalFormat(false)}
+                          style={{
+                            background: !internationalFormat ? theme.colors.primary : theme.colors.surface,
+                            color: !internationalFormat ? theme.colors.background : theme.colors.primary,
+                            border: 'none',
+                            borderRadius: '0',
+                            padding: '0.75rem 1.2rem',
+                            fontWeight: 600,
+                            fontSize: '0.85rem',
+                            cursor: 'pointer',
+                            transition: 'background 0.2s',
+                            outline: 'none',
+                            borderLeft: `1px solid ${theme.colors.secondary}`,
+                          }}
+                        >
+                          Lokaal
+                        </button>
                       </div>
                     </div>
                   )}
-                  {activeTab === 'landline' && (
-                    <div
-                      style={{
-                        background: theme.colors.surface,
-                        borderRadius: '1.5rem',
-                        boxShadow: '0 8px 32px 0 rgba(30,59,76,0.10), 0 4px 12px 0 rgba(0,0,0,0.05)',
-                        border: `1.5px solid ${theme.colors.secondary}`,
-                        maxWidth: 1000,
-                        margin: '0 auto',
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'stretch',
-                        justifyContent: 'center',
-                        padding: '2.5rem',
-                        gap: 0,
-                        fontFamily: 'Inter, Roboto, system-ui, sans-serif',
-                        minHeight: 420,
-                        transition: 'box-shadow 0.2s',
-                      }}
-                    >
-                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                        <label htmlFor="landline-country-select" style={{ fontWeight: 600, marginBottom: 8 }}>Land</label>
-                        <select
-                          id="landline-country-select"
-                          value={landlineCountry}
-                          onChange={e => setLandlineCountry(e.target.value as SupportedCountry)}
-                          style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', border: '1px solid #a7d0ff', fontSize: '1rem', marginBottom: 24, width: 220 }}
-                        >
-                          {landlineCountries.map(option => (
-                            <option key={option.value} value={option.value}>{option.label}</option>
-                          ))}
-                        </select>
+                  {/* Toggle switch for IBAN tab */}
+                  {activeTab === 'iban' && (
+                    <div style={{ display: 'flex', justifyContent: 'center', margin: '1.5rem 0' }}>
+                      <div style={{ display: 'flex', border: `2px solid ${theme.colors.secondary}`, borderRadius: '0.75rem', overflow: 'hidden' }}>
                         <button
-                          className="learn-more"
-                          onClick={handleGenerate}
+                          onClick={() => setActiveIbanMode('genereer')}
+                          style={{
+                            background: activeIbanMode === 'genereer' ? theme.colors.primary : theme.colors.surface,
+                            color: activeIbanMode === 'genereer' ? theme.colors.background : theme.colors.primary,
+                            border: 'none',
+                            borderRadius: '0',
+                            padding: '0.75rem 2rem',
+                            fontWeight: 600,
+                            fontSize: '1rem',
+                            cursor: 'pointer',
+                            transition: 'background 0.2s',
+                            outline: 'none',
+                          }}
                         >
                           Genereer
                         </button>
-                        {data.landline && (
-                          <div style={{ marginTop: 24, width: '100%' }}>
-                            <Card label="Vast telefoonnummer" value={formatPhoneNumber(data.landline)} onCopy={handleCopy} copied={!!copied.landline} />
-                          </div>
-                        )}
+                        <button
+                          onClick={() => setActiveIbanMode('controleer')}
+                          style={{
+                            background: activeIbanMode === 'controleer' ? theme.colors.primary : theme.colors.surface,
+                            color: activeIbanMode === 'controleer' ? theme.colors.background : theme.colors.primary,
+                            border: 'none',
+                            borderRadius: '0',
+                            padding: '0.75rem 2rem',
+                            fontWeight: 600,
+                            fontSize: '1rem',
+                            cursor: 'pointer',
+                            transition: 'background 0.2s',
+                            outline: 'none',
+                            borderLeft: `1px solid ${theme.colors.secondary}`,
+                          }}
+                        >
+                          Controleer
+                        </button>
                       </div>
                     </div>
                   )}
+                  {/* Toggle switch for BSN tab */}
                   {activeTab === 'bsn' && (
-                    <div
-                      style={{
-                        background: theme.colors.surface,
-                        borderRadius: '1.5rem',
-                        boxShadow: '0 8px 32px 0 rgba(30,59,76,0.10), 0 4px 12px 0 rgba(0,0,0,0.05)',
-                        border: `1.5px solid ${theme.colors.secondary}`,
-                        maxWidth: 1000,
-                        margin: '0 auto',
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'stretch',
-                        justifyContent: 'center',
-                        padding: '2.5rem',
-                        gap: 0,
-                        fontFamily: 'Inter, Roboto, system-ui, sans-serif',
-                        minHeight: 420,
-                        transition: 'box-shadow 0.2s',
-                      }}
-                    >
-                      {activeBsnMode === 'genereer' && (
-                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '0 2rem' }}>
-                          <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', gap: '0.75rem' }}>
-                            <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', justifyContent: 'center' }}>
-                              <div style={{ height: 0, minHeight: 0, flex: 1 }} />
-                              <button
-                                className="learn-more"
-                                onClick={handleGenerate}
-                              >
-                                Genereer
-                              </button>
-                              <div style={{ height: 0, minHeight: 0, flex: 1 }} />
+                    <div style={{ display: 'flex', justifyContent: 'center', margin: '1.5rem 0' }}>
+                      <div style={{ display: 'flex', border: `2px solid ${theme.colors.secondary}`, borderRadius: '0.75rem', overflow: 'hidden' }}>
+                        <button
+                          onClick={() => setActiveBsnMode('genereer')}
+                          style={{
+                            background: activeBsnMode === 'genereer' ? theme.colors.primary : theme.colors.surface,
+                            color: activeBsnMode === 'genereer' ? theme.colors.background : theme.colors.primary,
+                            border: 'none',
+                            borderRadius: '0',
+                            padding: '0.75rem 2rem',
+                            fontWeight: 600,
+                            fontSize: '1rem',
+                            cursor: 'pointer',
+                            transition: 'background 0.2s',
+                            outline: 'none',
+                          }}
+                        >
+                          Genereer
+                        </button>
+                        <button
+                          onClick={() => setActiveBsnMode('controleer')}
+                          style={{
+                            background: activeBsnMode === 'controleer' ? theme.colors.primary : theme.colors.surface,
+                            color: activeBsnMode === 'controleer' ? theme.colors.background : theme.colors.primary,
+                            border: 'none',
+                            borderRadius: '0',
+                            padding: '0.75rem 2rem',
+                            fontWeight: 600,
+                            fontSize: '1rem',
+                            cursor: 'pointer',
+                            transition: 'background 0.2s',
+                            outline: 'none',
+                            borderLeft: `1px solid ${theme.colors.secondary}`,
+                          }}
+                        >
+                          Controleer
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  <div className={`${styles.tabContent} ${tabAnim ? styles.tabContentAnim : ''}`}>
+                    {activeTab === 'mobile' && (
+                      <div
+                        style={{
+                          background: theme.colors.surface,
+                          borderRadius: '1.5rem',
+                          boxShadow: '0 8px 32px 0 rgba(30,59,76,0.10), 0 4px 12px 0 rgba(0,0,0,0.05)',
+                          border: `1.5px solid ${theme.colors.secondary}`,
+                          maxWidth: 1000,
+                          margin: '0 auto',
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems: 'stretch',
+                          justifyContent: 'center',
+                          padding: '2.5rem',
+                          gap: 0,
+                          fontFamily: 'Inter, Roboto, system-ui, sans-serif',
+                          minHeight: 420,
+                          transition: 'box-shadow 0.2s',
+                        }}
+                      >
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                          <label htmlFor="mobile-country-select" style={{ fontWeight: 600, marginBottom: 8 }}>Land</label>
+                          <select
+                            id="mobile-country-select"
+                            value={mobileCountry}
+                            onChange={e => setMobileCountry(e.target.value as SupportedCountry)}
+                            style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', border: '1px solid #a7d0ff', fontSize: '1rem', marginBottom: 24, width: 220 }}
+                          >
+                            {mobileCountries.map(option => (
+                              <option key={option.value} value={option.value}>{option.label}</option>
+                            ))}
+                          </select>
+                          <button
+                            className="learn-more"
+                            onClick={handleGenerate}
+                          >
+                            Genereer
+                          </button>
+                          {data.mobile && (
+                            <div style={{ marginTop: 24, width: '100%' }}>
+                              <Card label="Mobiel nummer" value={formatPhoneNumber(data.mobile)} onCopy={handleCopy} copied={!!copied.mobile} />
                             </div>
-                            {data.bsn && (
-                              <div style={{ width: '100%' }}>
-                                <Card label="BSN" value={data.bsn} onCopy={handleCopy} copied={!!copied.bsn} />
-                              </div>
-                            )}
-                          </div>
+                          )}
                         </div>
-                      )}
-                      {activeBsnMode === 'controleer' && (
-                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '0 2rem', minWidth: 0, maxWidth: 480 }}>
-                          <div style={{ width: '100%', maxWidth: 320 }}>
-                            <input
-                              style={{
-                                width: '100%',
-                                maxWidth: 320,
-                                minWidth: 220,
-                                padding: '0.85rem 1rem',
-                                borderRadius: '0.75rem',
-                                border: '1px solid #cbd5e1',
-                                fontSize: '1rem',
-                                fontFamily: 'inherit',
-                                marginBottom: '2rem',
-                              }}
-                              type="text"
-                              placeholder="Check BSN..."
-                              value={bsnInput}
-                              onChange={e => setBsnInput(e.target.value)}
+                      </div>
+                    )}
+                    {activeTab === 'landline' && (
+                      <div
+                        style={{
+                          background: theme.colors.surface,
+                          borderRadius: '1.5rem',
+                          boxShadow: '0 8px 32px 0 rgba(30,59,76,0.10), 0 4px 12px 0 rgba(0,0,0,0.05)',
+                          border: `1.5px solid ${theme.colors.secondary}`,
+                          maxWidth: 1000,
+                          margin: '0 auto',
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems: 'stretch',
+                          justifyContent: 'center',
+                          padding: '2.5rem',
+                          gap: 0,
+                          fontFamily: 'Inter, Roboto, system-ui, sans-serif',
+                          minHeight: 420,
+                          transition: 'box-shadow 0.2s',
+                        }}
+                      >
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                          <label htmlFor="landline-country-select" style={{ fontWeight: 600, marginBottom: 8 }}>Land</label>
+                          <select
+                            id="landline-country-select"
+                            value={landlineCountry}
+                            onChange={e => setLandlineCountry(e.target.value as SupportedCountry)}
+                            style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', border: '1px solid #a7d0ff', fontSize: '1rem', marginBottom: 24, width: 220 }}
+                          >
+                            {landlineCountries.map(option => (
+                              <option key={option.value} value={option.value}>{option.label}</option>
+                            ))}
+                          </select>
+                          <button
+                            className="learn-more"
+                            onClick={handleGenerate}
+                          >
+                            Genereer
+                          </button>
+                          {data.landline && (
+                            <div style={{ marginTop: 24, width: '100%' }}>
+                              <Card label="Vast telefoonnummer" value={formatPhoneNumber(data.landline)} onCopy={handleCopy} copied={!!copied.landline} />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    {activeTab === 'bsn' && (
+                      <div
+                        style={{
+                          background: theme.colors.surface,
+                          borderRadius: '1.5rem',
+                          boxShadow: '0 8px 32px 0 rgba(30,59,76,0.10), 0 4px 12px 0 rgba(0,0,0,0.05)',
+                          border: `1.5px solid ${theme.colors.secondary}`,
+                          maxWidth: 1000,
+                          margin: '0 auto',
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems: 'stretch',
+                          justifyContent: 'center',
+                          padding: '2.5rem',
+                          gap: 0,
+                          fontFamily: 'Inter, Roboto, system-ui, sans-serif',
+                          minHeight: 420,
+                          transition: 'box-shadow 0.2s',
+                        }}
+                      >
+                        {activeBsnMode === 'genereer' && (
+                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '0 2rem' }}>
+                            <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', gap: '0.75rem' }}>
+                              <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', justifyContent: 'center' }}>
+                                <div style={{ height: 0, minHeight: 0, flex: 1 }} />
+                                <button
+                                  className="learn-more"
+                                  onClick={handleGenerate}
+                                >
+                                  Genereer
+                                </button>
+                                <div style={{ height: 0, minHeight: 0, flex: 1 }} />
+                              </div>
+                              {data.bsn && (
+                                <div style={{ width: '100%' }}>
+                                  <Card label="BSN" value={data.bsn} onCopy={handleCopy} copied={!!copied.bsn} />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                        {activeBsnMode === 'controleer' && (
+                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '0 2rem', minWidth: 0, maxWidth: 480 }}>
+                            <div style={{ width: '100%', maxWidth: 320 }}>
+                              <input
+                                style={{
+                                  width: '100%',
+                                  maxWidth: 320,
+                                  minWidth: 220,
+                                  padding: '0.85rem 1rem',
+                                  borderRadius: '0.75rem',
+                                  border: '1px solid #cbd5e1',
+                                  fontSize: '1rem',
+                                  fontFamily: 'inherit',
+                                  marginBottom: '2rem',
+                                }}
+                                type="text"
+                                placeholder="Check BSN..."
+                                value={bsnInput}
+                                onChange={e => setBsnInput(e.target.value)}
                             />
                             <div style={{ display: 'flex', alignItems: 'flex-start', width: '100%' }}>
                               <div style={{ height: 0, minHeight: 0, flex: 1 }} />
@@ -785,69 +796,69 @@ function App() {
                             )}
                           </div>
                         </div>
-                      )}
-                    </div>
-                  )}
-                  {activeTab === 'iban' && (
-                    <div
-                      style={{
-                        background: theme.colors.surface,
-                        borderRadius: '1.5rem',
-                        boxShadow: '0 8px 32px 0 rgba(30,59,76,0.10), 0 4px 12px 0 rgba(0,0,0,0.05)',
-                        border: `1.5px solid ${theme.colors.secondary}`,
-                        maxWidth: 1000,
-                        margin: '0 auto',
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'stretch',
-                        justifyContent: 'center',
-                        padding: '2.5rem',
-                        gap: 0,
-                        fontFamily: 'Inter, Roboto, system-ui, sans-serif',
-                        minHeight: 420,
-                        transition: 'box-shadow 0.2s',
-                      }}
-                    >
-                      {activeIbanMode === 'genereer' && (
-                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '0 2rem' }}>
-                          <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', gap: '0.75rem' }}>
-                            <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', justifyContent: 'center' }}>
-                              <div style={{ height: 0, minHeight: 0, flex: 1 }} />
-                              <button
-                                className="learn-more"
-                                onClick={handleGenerate}
-                              >
-                                Genereer
-                              </button>
-                              <div style={{ height: 0, minHeight: 0, flex: 1 }} />
-                            </div>
-                            {data.iban && (
-                              <div style={{ width: '100%' }}>
-                                <Card label="IBAN" value={data.iban} onCopy={handleCopy} copied={!!copied.iban} />
+                        )}
+                      </div>
+                    )}
+                    {activeTab === 'iban' && (
+                      <div
+                        style={{
+                          background: theme.colors.surface,
+                          borderRadius: '1.5rem',
+                          boxShadow: '0 8px 32px 0 rgba(30,59,76,0.10), 0 4px 12px 0 rgba(0,0,0,0.05)',
+                          border: `1.5px solid ${theme.colors.secondary}`,
+                          maxWidth: 1000,
+                          margin: '0 auto',
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems: 'stretch',
+                          justifyContent: 'center',
+                          padding: '2.5rem',
+                          gap: 0,
+                          fontFamily: 'Inter, Roboto, system-ui, sans-serif',
+                          minHeight: 420,
+                          transition: 'box-shadow 0.2s',
+                        }}
+                      >
+                        {activeIbanMode === 'genereer' && (
+                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '0 2rem' }}>
+                            <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', gap: '0.75rem' }}>
+                              <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', justifyContent: 'center' }}>
+                                <div style={{ height: 0, minHeight: 0, flex: 1 }} />
+                                <button
+                                  className="learn-more"
+                                  onClick={handleGenerate}
+                                >
+                                  Genereer
+                                </button>
+                                <div style={{ height: 0, minHeight: 0, flex: 1 }} />
                               </div>
-                            )}
+                              {data.iban && (
+                                <div style={{ width: '100%' }}>
+                                  <Card label="IBAN" value={data.iban} onCopy={handleCopy} copied={!!copied.iban} />
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      )}
-                      {activeIbanMode === 'controleer' && (
-                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '0 2rem', minWidth: 0, maxWidth: 480 }}>
-                          <div style={{ width: '100%', maxWidth: 320 }}>
-                            <input
-                              style={{
-                                width: '100%',
-                                maxWidth: 320,
-                                minWidth: 220,
-                                padding: '0.85rem 1rem',
-                                borderRadius: '0.75rem',
-                                border: '1px solid #cbd5e1',
-                                fontSize: '1rem',
-                                fontFamily: 'inherit',
-                                marginBottom: '2rem',
-                              }}
-                              type="text"
-                              placeholder="Check IBAN..."
-                              value={ibanInput}
-                              onChange={e => setIbanInput(e.target.value)}
+                        )}
+                        {activeIbanMode === 'controleer' && (
+                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '0 2rem', minWidth: 0, maxWidth: 480 }}>
+                            <div style={{ width: '100%', maxWidth: 320 }}>
+                              <input
+                                style={{
+                                  width: '100%',
+                                  maxWidth: 320,
+                                  minWidth: 220,
+                                  padding: '0.85rem 1rem',
+                                  borderRadius: '0.75rem',
+                                  border: '1px solid #cbd5e1',
+                                  fontSize: '1rem',
+                                  fontFamily: 'inherit',
+                                  marginBottom: '2rem',
+                                }}
+                                type="text"
+                                placeholder="Check IBAN..."
+                                value={ibanInput}
+                                onChange={e => setIbanInput(e.target.value)}
                             />
                             <div style={{ display: 'flex', alignItems: 'flex-start', width: '100%' }}>
                               <div style={{ height: 0, minHeight: 0, flex: 1 }} />
@@ -916,108 +927,108 @@ function App() {
                             )}
                           </div>
                         </div>
-                      )}
-                    </div>
-                  )}
-                  {activeTab === 'adres' && (
-                    <div
-                      style={{
-                        background: theme.colors.surface,
-                        borderRadius: '1.5rem',
-                        boxShadow: '0 8px 32px 0 rgba(30,59,76,0.10), 0 4px 12px 0 rgba(0,0,0,0.05)',
-                        border: `1.5px solid ${theme.colors.secondary}`,
-                        maxWidth: 1000,
-                        margin: '0 auto',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        padding: '2.5rem',
-                        fontFamily: 'Inter, Roboto, system-ui, sans-serif',
-                        minHeight: 420,
-                        transition: 'box-shadow 0.2s',
-                      }}
-                    >
-                      <div style={{ marginBottom: 18, fontWeight: 600, fontSize: '1.12rem', textAlign: 'center' }}>
-                        Vul een plaatsnaam in of haal een random plaatsnaam op
+                        )}
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-                        <input
-                          id="adres-plaatsnaam-input"
-                          type="text"
-                          placeholder="Vul een plaatsnaam in..."
-                          value={adresPlaatsnaam}
-                          onChange={e => setAdresPlaatsnaam(e.target.value)}
-                          style={{
-                            padding: '0.85rem 1rem',
-                            borderRadius: '0.75rem',
-                            border: `1px solid ${theme.colors.secondary}`,
-                            fontSize: '1rem',
-                            width: 220,
-                            marginRight: 4
-                          }}
-                        />
-                        <button
-                          type="button"
-                          aria-label="Haal een random plaatsnaam op"
-                          style={{
-                            color: 'white',
-                            backgroundColor: theme.colors.primary,
-                            fontWeight: 500,
-                            borderRadius: '0.5rem',
-                            fontSize: '0.9rem',
-                            lineHeight: '1.5rem',
-                            paddingLeft: '1.5rem',
-                            paddingRight: '1.5rem',
-                            paddingTop: '0.6rem',
-                            paddingBottom: '0.6rem',
-                            cursor: plaatsnaamLoading ? 'wait' : 'pointer',
-                            textAlign: 'center' as const,
-                            marginRight: '0.5rem',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            border: 'none',
-                            opacity: plaatsnaamLoading ? 0.7 : 1,
-                            transition: 'background-color 0.2s, opacity 0.2s',
-                            overflow: 'hidden',
-                            position: 'relative',
-                          }}
-                          className="refresh-button"
-                          onMouseEnter={(e) => {
-                            if (!plaatsnaamLoading) {
-                              e.currentTarget.style.backgroundColor = theme.colors.secondary;
-                            }
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = theme.colors.primary;
-                          }}
-                          disabled={plaatsnaamLoading}
-                          onClick={async () => {
-                            setPlaatsnaamLoading(true);
-                            const plaatsnaam = await getRandomPlaatsnaam();
-                            setAdresPlaatsnaam(plaatsnaam ?? '');
-                            setPlaatsnaamLoading(false);
-                          }}
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            viewBox="0 0 16 16"
+                    )}
+                    {activeTab === 'adres' && (
+                      <div
+                        style={{
+                          background: theme.colors.surface,
+                          borderRadius: '1.5rem',
+                          boxShadow: '0 8px 32px 0 rgba(30,59,76,0.10), 0 4px 12px 0 rgba(0,0,0,0.05)',
+                          border: `1.5px solid ${theme.colors.secondary}`,
+                          maxWidth: 1000,
+                          margin: '0 auto',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: '2.5rem',
+                          fontFamily: 'Inter, Roboto, system-ui, sans-serif',
+                          minHeight: 420,
+                          transition: 'box-shadow 0.2s',
+                        }}
+                      >
+                        <div style={{ marginBottom: 18, fontWeight: 600, fontSize: '1.12rem', textAlign: 'center' }}>
+                          Vul een plaatsnaam in of haal een random plaatsnaam op
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+                          <input
+                            id="adres-plaatsnaam-input"
+                            type="text"
+                            placeholder="Vul een plaatsnaam in..."
+                            value={adresPlaatsnaam}
+                            onChange={e => setAdresPlaatsnaam(e.target.value)}
                             style={{
-                              display: 'inline',
-                              width: '1.1rem',
-                              height: '1.1rem',
-                              marginRight: '0.5rem',
+                              padding: '0.85rem 1rem',
+                              borderRadius: '0.75rem',
+                              border: `1px solid ${theme.colors.secondary}`,
+                              fontSize: '1rem',
+                              width: 220,
+                              marginRight: 4
+                            }}
+                          />
+                          <button
+                            type="button"
+                            aria-label="Haal een random plaatsnaam op"
+                            style={{
                               color: 'white',
-                              animation: plaatsnaamLoading ? 'spin_357 1s linear infinite' : 'none',
+                              backgroundColor: theme.colors.primary,
+                              fontWeight: 500,
+                              borderRadius: '0.5rem',
+                              fontSize: '0.9rem',
+                              lineHeight: '1.5rem',
+                              paddingLeft: '1.5rem',
+                              paddingRight: '1.5rem',
+                              paddingTop: '0.6rem',
+                              paddingBottom: '0.6rem',
+                              cursor: plaatsnaamLoading ? 'wait' : 'pointer',
+                              textAlign: 'center' as const,
+                              marginRight: '0.5rem',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              border: 'none',
+                              opacity: plaatsnaamLoading ? 0.7 : 1,
+                              transition: 'background-color 0.2s, opacity 0.2s',
+                              overflow: 'hidden',
+                              position: 'relative',
+                            }}
+                            className="refresh-button"
+                            onMouseEnter={(e) => {
+                              if (!plaatsnaamLoading) {
+                                e.currentTarget.style.backgroundColor = theme.colors.secondary;
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = theme.colors.primary;
+                            }}
+                            disabled={plaatsnaamLoading}
+                            onClick={async () => {
+                              setPlaatsnaamLoading(true);
+                              const plaatsnaam = await getRandomPlaatsnaam();
+                              setAdresPlaatsnaam(plaatsnaam ?? '');
+                              setPlaatsnaamLoading(false);
                             }}
                           >
-                            <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"></path>
-                            <path
-                              fillRule="evenodd"
-                              d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              fill="currentColor"
+                              viewBox="0 0 16 16"
+                              style={{
+                                display: 'inline',
+                                width: '1.1rem',
+                                height: '1.1rem',
+                                marginRight: '0.5rem',
+                                color: 'white',
+                                animation: plaatsnaamLoading ? 'spin_357 1s linear infinite' : 'none',
+                              }}
+                            >
+                              <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"></path>
+                              <path
+                                fillRule="evenodd"
+                                d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"
                             ></path>
                             <style>{`
                               @keyframes spin_357 {
@@ -1125,6 +1136,7 @@ function App() {
             </GeneratorBg>
           } />
         </Routes>
+        </AuthProvider>
       </Router>
     </ThemeProvider>
   );
